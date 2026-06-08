@@ -6,7 +6,6 @@ import {
   WALK_TOP_ROW,
   WALK_BOTTOM_ROW,
   WORLD_W,
-  WORLD_COLS,
 } from './world'
 import type { InputState } from './input'
 import type { Facing } from '../art/drawSprites'
@@ -95,5 +94,3 @@ export function walkStep(p: PlayerState): number {
 export function playerCenter(p: PlayerState): { cx: number; cy: number } {
   return { cx: p.x + PLAYER_W / 2, cy: p.y + PLAYER_H / 2 }
 }
-
-export const WORLD_TILE_COLS = WORLD_COLS

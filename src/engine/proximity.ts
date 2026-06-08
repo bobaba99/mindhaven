@@ -23,9 +23,3 @@ export function nearestBuildingId(player: PlayerState): string | null {
   }
   return bestId
 }
-
-export function buildingDoorPixel(id: string): { x: number; y: number } | null {
-  const place = PLACEMENTS.find((p) => p.id === id)
-  if (!place) return null
-  return { x: place.doorCol * TILE + TILE / 2, y: place.doorRow * TILE }
-}

@@ -75,5 +75,3 @@ export function createInput(opts: {
     },
   }
 }
-
-export { INTERACT_KEYS }
