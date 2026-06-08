@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 interface TitleScreenProps {
   onStart: () => void
   hasProgress: boolean
@@ -5,6 +7,18 @@ interface TitleScreenProps {
 
 /** Cozy title card shown before entering the town. */
 export function TitleScreen({ onStart, hasProgress }: TitleScreenProps) {
+  // Enter / Space starts the game without needing to focus the button first.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        onStart()
+      }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [onStart])
+
   return (
     <div className="title-screen">
       <div className="title-screen__card pixel-panel">

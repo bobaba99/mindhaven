@@ -30,7 +30,7 @@ export function Journal({
   }, [onClose])
 
   return (
-    <div className="overlay" role="dialog" aria-label="Insight Journal">
+    <div className="overlay" role="dialog" aria-modal="true" aria-label="Insight Journal">
       <div className="journal pixel-panel">
         <header className="journal__head">
           <h2>Insight Journal</h2>

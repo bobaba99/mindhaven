@@ -20,7 +20,7 @@ export function LectureRevisit({ lecture, onClose }: LectureRevisitProps) {
   }, [onClose])
 
   return (
-    <div className="overlay overlay--top" role="dialog" aria-label={lecture.title}>
+    <div className="overlay overlay--top" role="dialog" aria-modal="true" aria-label={lecture.title}>
       <div className="revisit pixel-panel">
         <h3 className="lecture-panel__title">{lecture.title}</h3>
         <p className="lecture-panel__body">{lecture.blurb}</p>

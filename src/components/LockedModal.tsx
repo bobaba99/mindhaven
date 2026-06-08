@@ -1,5 +1,7 @@
+import { useRef } from 'react'
 import type { Building } from '../data/types'
 import { NpcAvatar } from './NpcAvatar'
+import { useModalKeys } from '../hooks/useModalKeys'
 
 interface LockedModalProps {
   building: Building
@@ -18,9 +20,11 @@ export function LockedModal({
   onClose,
 }: LockedModalProps) {
   const needed = building.unlockCost - insight
+  const panelRef = useRef<HTMLDivElement>(null)
+  useModalKeys(panelRef, onClose)
   return (
-    <div className="overlay" role="dialog" aria-label="Locked building">
-      <div className="locked-modal pixel-panel">
+    <div className="overlay" role="dialog" aria-modal="true" aria-label={`${building.name} (locked)`}>
+      <div className="locked-modal pixel-panel" ref={panelRef}>
         <header className="locked-modal__head">
           <NpcAvatar name={building.figure} size={56} />
           <div>

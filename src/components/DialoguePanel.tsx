@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { Building } from '../data/types'
 import { useTypewriter } from '../hooks/useTypewriter'
 import { NpcAvatar } from './NpcAvatar'
@@ -32,6 +32,7 @@ export function DialoguePanel({
   const [tab, setTab] = useState<Tab>('intro')
   const [openLecture, setOpenLecture] = useState<string | null>(null)
   const { shown, done, skip } = useTypewriter(building.intro, 50)
+  const panelRef = useRef<HTMLDivElement>(null)
 
   // Grant intro Insight the first time this panel mounts for the building.
   useEffect(() => {
@@ -39,13 +40,34 @@ export function DialoguePanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [building.id])
 
-  // Close on Escape.
+  // Close on Escape (pop an open lecture first), and trap Tab inside the panel.
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault()
         if (openLecture) setOpenLecture(null)
         else onClose()
+        return
+      }
+      if (e.key === 'Tab') {
+        const node = panelRef.current
+        if (!node) return
+        const items = Array.from(
+          node.querySelectorAll<HTMLElement>(
+            'button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])',
+          ),
+        )
+        if (items.length === 0) return
+        const first = items[0]
+        const last = items[items.length - 1]
+        const active = document.activeElement as HTMLElement | null
+        if (e.shiftKey && active === first) {
+          e.preventDefault()
+          last.focus()
+        } else if (!e.shiftKey && active === last) {
+          e.preventDefault()
+          first.focus()
+        }
       }
     }
     window.addEventListener('keydown', onKey)
@@ -58,8 +80,8 @@ export function DialoguePanel({
   ).length
 
   return (
-    <div className="overlay" role="dialog" aria-label={`${building.figure} dialogue`}>
-      <div className="dialogue pixel-panel">
+    <div className="overlay" role="dialog" aria-modal="true" aria-label={`${building.figure} dialogue`}>
+      <div className="dialogue pixel-panel" ref={panelRef}>
         <header className="dialogue__head">
           <NpcAvatar name={building.figure} size={72} />
           <div className="dialogue__title">
@@ -102,7 +124,19 @@ export function DialoguePanel({
 
         <div className="dialogue__body">
           {tab === 'intro' && (
-            <div className="dialogue__intro" onClick={skip}>
+            <div
+              className="dialogue__intro"
+              onClick={done ? undefined : skip}
+              onKeyDown={(e) => {
+                if (!done && (e.key === 'Enter' || e.key === ' ')) {
+                  e.preventDefault()
+                  skip()
+                }
+              }}
+              role={done ? undefined : 'button'}
+              tabIndex={done ? undefined : 0}
+              aria-label={done ? undefined : 'Skip the typewriter animation'}
+            >
               <p className="dialogue__speech">
                 {shown}
                 {!done && <span className="caret">▌</span>}
