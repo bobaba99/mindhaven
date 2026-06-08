@@ -23,10 +23,11 @@ Production build (type-checked) / preview:
 ```bash
 npm run build    # tsc -b && vite build  — passes clean
 npm run preview
+npm test         # vitest run — 27 unit tests, all passing
 ```
 
 Requires Node 22 / npm 10 (developed on those). Stack: **React + TypeScript +
-Vite**, plain CSS (no UI framework).
+Vite**, plain CSS (no UI framework), **Vitest** (jsdom) for unit tests.
 
 ## Controls
 
@@ -107,9 +108,31 @@ readable) was prioritized over deep minigames, per the brief.
   screens, but there are **no touch controls** for walking — keyboard required.
 - No audio.
 - Camera pins vertically (the street is short); it scrolls horizontally only.
-- No automated test suite in this MVP; the full loop was verified manually in a
-  headless browser (movement → prompt → dialogue → lecture → activity → Insight
-  → persistence → journal → gating all confirmed).
+- **27 unit tests** (`npm test`) cover the core pure logic — progress reducers
+  and gating, `localStorage` hardening, world-placement math, and `shuffle`. The
+  React components / canvas rendering are not yet unit-tested; the full loop is
+  verified manually in a headless browser (movement → prompt → dialogue →
+  lecture → activity → Insight → persistence → journal → gating all confirmed).
+
+## Hardening pass (adversarial audit)
+
+After the initial build, a 5-dimension adversarial audit (correctness, content
+accuracy, a11y/UX, TypeScript quality, render/perf) was run, each finding
+independently verified before action. Fixes applied:
+
+- **Correctness:** `setTimeout` cleanup on unmount in Lever/Memory/Maslow games;
+  clarified that Insight is a **cumulative threshold score, not a spendable
+  currency** (unlocking does not deduct it — that would break the escalating
+  6 → 72 gates); `loadProgress` now rejects corrupt/tampered storage (clamps
+  bad Insight, drops unknown building/lecture ids, survives malformed JSON).
+- **Rendering:** backing store now scales by `devicePixelRatio` so pixel art
+  stays crisp on Retina/hi-DPI (was upscaled + blurred); 2D context cached
+  instead of fetched every frame.
+- **Accessibility:** Escape + Tab focus-trap on all modals, keyboard-operable
+  typewriter-skip, `:focus-visible` rings, `aria-modal`, status-announced
+  interact prompt, Enter/Space to start.
+- **Quality:** shared `shuffle`/`useModalKeys` utils (de-duplicated), named
+  magic constants, removed an unsafe cast and dead code.
 
 ## Project structure
 
@@ -117,9 +140,11 @@ readable) was prioritized over deep minigames, per the brief.
 src/
   data/        buildings.ts (all content), types.ts
   engine/      world.ts (layout), input.ts, player.ts, townsfolk.ts,
-               proximity.ts, progress.ts (Insight + persistence), renderTown.ts
+               proximity.ts, progress.ts (Insight + persistence), renderTown.ts,
+               shuffle.ts  · *.test.ts (progress, world, shuffle)
   art/         palette.ts, drawTiles.ts, drawBuilding.ts, drawSprites.ts
-  hooks/       useGameLoop.ts (rAF loop + camera), useProgress.ts, useTypewriter.ts
+  hooks/       useGameLoop.ts (rAF loop + camera), useProgress.ts,
+               useTypewriter.ts, useModalKeys.ts (Escape + focus-trap)
   components/  TownCanvas, InteractPrompt, HUD, DialoguePanel, LecturePanel,
                LockedModal, Journal, LectureRevisit, TitleScreen, NpcAvatar,
                minigames/ (ReactionGame, MemoryGame, BellGame, LeverGame,
