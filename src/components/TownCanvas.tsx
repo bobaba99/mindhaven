@@ -21,20 +21,24 @@ export function TownCanvas({ unlockedIds, paused, onInteract }: TownCanvasProps)
   const wrapRef = useRef<HTMLDivElement>(null)
   const [near, setNear] = useState<string | null>(null)
 
-  // Resize the canvas backing store to match the wrapper, at integer scale.
+  // Resize the canvas. The CSS box is sized in logical (layout) pixels; the
+  // backing store is logical × devicePixelRatio so pixel art stays crisp on
+  // Retina / high-DPI screens instead of being upscaled and blurred. The game
+  // loop reads the DPR back from (backing width / CSS width).
   useEffect(() => {
     const resize = () => {
       const canvas = canvasRef.current
       const wrap = wrapRef.current
       if (!canvas || !wrap) return
-      const w = wrap.clientWidth
+      const dpr = Math.max(1, Math.floor(window.devicePixelRatio || 1))
+      const cssW = Math.floor(wrap.clientWidth)
       // cap drawn height to the world so we never show empty space below
       const worldPx = WORLD_H * SCALE
-      const h = Math.min(wrap.clientHeight, worldPx)
-      canvas.width = Math.floor(w)
-      canvas.height = Math.floor(h)
-      canvas.style.width = `${Math.floor(w)}px`
-      canvas.style.height = `${Math.floor(h)}px`
+      const cssH = Math.floor(Math.min(wrap.clientHeight, worldPx))
+      canvas.width = cssW * dpr
+      canvas.height = cssH * dpr
+      canvas.style.width = `${cssW}px`
+      canvas.style.height = `${cssH}px`
     }
     resize()
     window.addEventListener('resize', resize)

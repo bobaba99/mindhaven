@@ -1,8 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { shuffle } from '../../engine/shuffle'
 
 interface MaslowGameProps {
   onSuccess: () => void
 }
+
+/** ms the "toppled" state shows before the cake resets. */
+const TOPPLE_RESET_MS = 900
 
 interface Tier {
   id: string
@@ -19,20 +23,14 @@ const TIERS: Tier[] = [
   { id: 'actualization', label: 'Self-Actualization', color: '#4a7a9a' },
 ]
 
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr]
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[a[i], a[j]] = [a[j], a[i]]
-  }
-  return a
-}
-
 /** Maslow: stack the needs-cake bottom-up in the correct order. */
 export function MaslowGame({ onSuccess }: MaslowGameProps) {
   const [pool, setPool] = useState<Tier[]>(() => shuffle(TIERS))
   const [stack, setStack] = useState<Tier[]>([])
   const [toppled, setToppled] = useState(false)
+  const resetTimer = useRef<number>(0)
+
+  useEffect(() => () => window.clearTimeout(resetTimer.current), [])
 
   const place = (tier: Tier) => {
     if (toppled) return
@@ -45,11 +43,11 @@ export function MaslowGame({ onSuccess }: MaslowGameProps) {
     } else {
       // wrong tier -> topple, restart
       setToppled(true)
-      window.setTimeout(() => {
+      resetTimer.current = window.setTimeout(() => {
         setStack([])
         setPool(shuffle(TIERS))
         setToppled(false)
-      }, 900)
+      }, TOPPLE_RESET_MS)
     }
   }
 

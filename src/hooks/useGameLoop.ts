@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { SCALE, WORLD_W, WORLD_H, PLAYER_W } from '../engine/world'
+import { SCALE, WORLD_W, PLAYER_W } from '../engine/world'
 import { createInput } from '../engine/input'
 import {
   spawnPlayer,
@@ -74,6 +74,18 @@ export function useGameLoop({
     let raf = 0
     let last = performance.now()
 
+    // Cache the 2D context (and which canvas it belongs to) so we don't call
+    // getContext on every frame.
+    let cachedCanvas: HTMLCanvasElement | null = null
+    let cachedCtx: CanvasRenderingContext2D | null = null
+    const getCtx = (canvas: HTMLCanvasElement): CanvasRenderingContext2D | null => {
+      if (cachedCanvas !== canvas) {
+        cachedCanvas = canvas
+        cachedCtx = canvas.getContext('2d')
+      }
+      return cachedCtx
+    }
+
     const tick = (now: number) => {
       const dt = Math.min(0.05, (now - last) / 1000)
       last = now
@@ -95,22 +107,28 @@ export function useGameLoop({
 
     const draw = () => {
       const canvas = canvasRef.current
-      const ctx = canvas?.getContext('2d')
       const stat = staticRef.current
-      if (!canvas || !ctx || !stat) return
+      if (!canvas || !stat) return
+      const ctx = getCtx(canvas)
+      if (!ctx) return
 
-      const viewW = canvas.width / SCALE
-      const viewH = canvas.height / SCALE
+      // Backing store is CSS pixels × devicePixelRatio; recover the DPR so we
+      // draw at logical scale (SCALE) while filling the crisp hi-DPI buffer.
+      const cssW = parseFloat(canvas.style.width) || canvas.width
+      const dpr = canvas.width / cssW
+      const drawScale = SCALE * dpr
+      const viewW = canvas.width / drawScale
 
-      // camera: center on player, clamped to world bounds
+      // camera: center on player horizontally, clamped to world bounds. The
+      // street is short, so the vertical camera is pinned to the top (camY = 0).
       const p = playerRef.current
       const camX = clamp(p.x + PLAYER_W / 2 - viewW / 2, 0, Math.max(0, WORLD_W - viewW))
-      const camY = clamp(0, 0, Math.max(0, WORLD_H - viewH)) // street is short; pin to top
+      const camY = 0
 
       ctx.imageSmoothingEnabled = false
       ctx.clearRect(0, 0, canvas.width, canvas.height)
       ctx.save()
-      ctx.scale(SCALE, SCALE)
+      ctx.scale(drawScale, drawScale)
       ctx.translate(-camX, -camY)
 
       // static world

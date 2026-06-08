@@ -1,8 +1,12 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { shuffle } from '../../engine/shuffle'
 
 interface MemoryGameProps {
   onSuccess: () => void
 }
+
+/** ms a mismatched pair stays face-up before flipping back. */
+const MISMATCH_FLIP_BACK_MS = 700
 
 /** Calkins paired-associate pairs: a cue and its learned partner. */
 const PAIRS: Array<[string, string]> = [
@@ -16,15 +20,6 @@ interface Card {
   id: number
   pairId: number
   label: string
-}
-
-function shuffle<T>(arr: T[]): T[] {
-  const a = [...arr]
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[a[i], a[j]] = [a[j], a[i]]
-  }
-  return a
 }
 
 function buildDeck(): Card[] {
@@ -43,6 +38,9 @@ export function MemoryGame({ onSuccess }: MemoryGameProps) {
   const [matched, setMatched] = useState<Set<number>>(new Set())
   const [moves, setMoves] = useState(0)
   const won = matched.size === deck.length
+  const flipBackTimer = useRef<number>(0)
+
+  useEffect(() => () => window.clearTimeout(flipBackTimer.current), [])
 
   const cluesMemo = useMemo(
     () => PAIRS.map(([a, b]) => `${a} → ${b}`).join('   ·   '),
@@ -66,7 +64,10 @@ export function MemoryGame({ onSuccess }: MemoryGameProps) {
         setFlipped([])
         if (m2.size === deck.length) onSuccess()
       } else {
-        window.setTimeout(() => setFlipped([]), 700)
+        flipBackTimer.current = window.setTimeout(
+          () => setFlipped([]),
+          MISMATCH_FLIP_BACK_MS,
+        )
       }
     }
   }

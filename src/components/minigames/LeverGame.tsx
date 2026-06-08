@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 interface LeverGameProps {
   onSuccess: () => void
@@ -6,9 +6,18 @@ interface LeverGameProps {
 
 type Schedule = 'continuous' | 'fixed' | 'variable'
 
+const SCHEDULES: readonly Schedule[] = ['continuous', 'fixed', 'variable']
+
+/** ms the reward flash stays lit after a paying lever press. */
+const REWARD_FLASH_MS = 180
+/** Fixed-ratio: reward on every Nth press. */
+const FIXED_RATIO = 4
+/** Variable-ratio: payoff probability per press (~1 in 4). */
+const VARIABLE_RATIO_P = 0.25
+
 const NEXT_LABEL: Record<Schedule, string> = {
   continuous: 'Continuous (reward every press)',
-  fixed: 'Fixed-ratio (reward every 4th press)',
+  fixed: `Fixed-ratio (reward every ${FIXED_RATIO}th press)`,
   variable: 'Variable-ratio (reward ~1 in 4, unpredictable)',
 }
 
@@ -19,19 +28,23 @@ export function LeverGame({ onSuccess }: LeverGameProps) {
   const [rewards, setRewards] = useState(0)
   const [flash, setFlash] = useState(false)
   const [acted, setActed] = useState(false)
+  const flashTimer = useRef<number>(0)
+
+  useEffect(() => () => window.clearTimeout(flashTimer.current), [])
 
   const press = () => {
     const n = presses + 1
     setPresses(n)
     let pay = false
     if (schedule === 'continuous') pay = true
-    else if (schedule === 'fixed') pay = n % 4 === 0
-    else pay = Math.random() < 0.25 // variable ratio ~1/4
+    else if (schedule === 'fixed') pay = n % FIXED_RATIO === 0
+    else pay = Math.random() < VARIABLE_RATIO_P
 
     if (pay) {
       setRewards((r) => r + 1)
       setFlash(true)
-      window.setTimeout(() => setFlash(false), 180)
+      window.clearTimeout(flashTimer.current)
+      flashTimer.current = window.setTimeout(() => setFlash(false), REWARD_FLASH_MS)
     }
     if (!acted) {
       setActed(true)
@@ -55,7 +68,7 @@ export function LeverGame({ onSuccess }: LeverGameProps) {
         engine inside every slot machine.
       </p>
       <div className="lever-schedules">
-        {(['continuous', 'fixed', 'variable'] as Schedule[]).map((s) => (
+        {SCHEDULES.map((s) => (
           <button
             key={s}
             className={`pixel-btn${schedule === s ? ' pixel-btn--primary' : ''}`}
