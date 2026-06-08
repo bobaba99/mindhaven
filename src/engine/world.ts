@@ -86,5 +86,6 @@ export const PLAYER_SPEED = 60
 export const PLAYER_W = 10
 export const PLAYER_H = 12
 
-/** Distance (in pre-scale px) within which the door prompt appears. */
-export const INTERACT_RADIUS = TILE * 1.4
+/** Distance (in pre-scale px) within which the door prompt appears. Generous
+ *  enough that walking the street in front of a facade registers the prompt. */
+export const INTERACT_RADIUS = TILE * 3.2
