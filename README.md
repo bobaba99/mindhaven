@@ -11,6 +11,12 @@ through behaviorism, psychoanalysis, humanism, the cognitive turn, and
 All pixel art is **generated procedurally in code** (drawn to an HTML5 canvas).
 No external/copyrighted assets — original art only.
 
+## Screenshots
+
+| Title | Town (Wundt Way) | NPC dialogue |
+|-------|------------------|--------------|
+| ![Title screen](docs/screenshots/title.png) | ![Town](docs/screenshots/town.png) | ![Dialogue](docs/screenshots/dialogue.png) |
+
 ## Run it
 
 ```bash
