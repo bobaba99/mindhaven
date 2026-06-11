@@ -2,6 +2,10 @@
 
 **▶ Play it now: [mindhaven-game.vercel.app](https://mindhaven-game.vercel.app)** — free, in your browser, desktop or phone.
 
+Version updates ship as an in-game newspaper, **The Wundt Way Gazette** (📰 on
+the title screen) — archive in [docs/GAZETTE.md](docs/GAZETTE.md), upcoming
+releases in [docs/ROADMAP.md](docs/ROADMAP.md).
+
 A cozy, **Stardew Valley–style pixel-art educational game**. Stroll **Wundt
 Way**, a single Main Street that is a walkable history of psychology: each of
 14 building facades is run by a famous psychologist who greets you in
