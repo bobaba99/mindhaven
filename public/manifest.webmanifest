@@ -1,0 +1,30 @@
+{
+  "name": "Mindhaven — A Walkable History of Psychology",
+  "short_name": "Mindhaven",
+  "description": "A cozy Stardew-style pixel town where every shopkeeper is a famous psychologist. Walk Wundt Way, play their theories, bank Insight.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#243b2f",
+  "theme_color": "#4a3018",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

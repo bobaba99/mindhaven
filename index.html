@@ -3,11 +3,43 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>Mindhaven — A Walkable History of Psychology</title>
+    <meta
+      name="description"
+      content="A cozy Stardew-style pixel town where every shopkeeper is a famous psychologist. Walk Wundt Way from Wundt's 1879 lab to modern social psychology, play 14 theory minigames, and bank Insight. Free, in your browser."
+    />
+    <meta name="theme-color" content="#4a3018" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Mindhaven" />
+    <meta property="og:title" content="Mindhaven — A Walkable History of Psychology" />
+    <meta
+      property="og:description"
+      content="A cozy pixel-art town where Pavlov runs the general store and Freud runs the pharmacy. Walk a century of psychology, play the theories, free in your browser."
+    />
+    <meta property="og:image" content="https://mindhaven-game.vercel.app/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:url" content="https://mindhaven-game.vercel.app/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Mindhaven — A Walkable History of Psychology" />
+    <meta
+      name="twitter:description"
+      content="A cozy pixel-art town where Pavlov runs the general store and Freud runs the pharmacy. Walk a century of psychology, play the theories, free in your browser."
+    />
+    <meta name="twitter:image" content="https://mindhaven-game.vercel.app/og.png" />
   </head>
   <body>
     <div id="root"></div>
+    <noscript>
+      <p style="font-family: monospace; padding: 24px; text-align: center">
+        Mindhaven is a browser game and needs JavaScript to run. Please enable
+        JavaScript and reload.
+      </p>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
