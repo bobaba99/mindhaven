@@ -12,8 +12,16 @@ export type HookKind =
   | 'paired-memory' // Calkins: paired-associate matching
   | 'bell' // Pavlov: ring the bell, watch extinction
   | 'lever' // Skinner: variable-ratio lever press
+  | 'watson-pairing' // Watson: ethical chime+treat conditioning
+  | 'freud-dreams' // Freud: manifest -> latent dream matching
+  | 'jung-deck' // Jung: balance the archetype hand
   | 'maslow-stack' // Maslow: stack the needs pyramid
+  | 'rogers-guestbook' // Rogers: reflective-listening guestbook
+  | 'piaget-sort' // Piaget: sort tasks onto stages
+  | 'bandura-model' // Bandura: watch, then reproduce the combo
   | 'kahneman-snap' // Kahneman: fast vs slow snap question
+  | 'loftus-photo' // Loftus: leading-question photo interview
+  | 'asch-stage' // Asch: line judging against a planted crowd
   | 'stub' // styled "hook coming soon"
 
 export interface Building {

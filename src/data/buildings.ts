@@ -173,8 +173,8 @@ export const BUILDINGS: Building[] = [
     intro:
       "Give me a dozen healthy infants, I once boasted, and I'll shape any one of them into anything. Bold words — and the Little Albert study is a cautionary tale we tell honestly here. Come meet the animals; we'll learn stimulus and response the *kind* way.",
     hookDescription:
-      'A gentle petting zoo: pair neutral and pleasant stimuli to calm (never frighten) animals — an ethical re-do of the original study.',
-    hookKind: 'stub',
+      'A gentle petting zoo: pair a soft chime with treats until the chime alone calms the animals — an ethical re-do of the original study.',
+    hookKind: 'watson-pairing',
     unlockCost: 18,
     palette: {
       wall: '#cdb88e', wallDark: '#a8946d', roof: '#6e8a4a', roofDark: '#516836',
@@ -212,8 +212,8 @@ export const BUILDINGS: Building[] = [
     intro:
       "Lie back. Tell me whatever drifts in, however absurd — *especially* if it embarrasses you. The mind keeps a cellar, and at night its contents come up the stairs in costume. Bring me your dreams; I'll help you read the labels.",
     hookDescription:
-      'Nap on the couch to enter a dream mini-game; harvest symbolic objects and interpret them (historical theory, not clinical fact).',
-    hookKind: 'stub',
+      "Nap on the couch, then read each dream's manifest content for the latent wish beneath (historical theory, not clinical fact).",
+    hookKind: 'freud-dreams',
     unlockCost: 24,
     palette: {
       wall: '#b9a7c2', wallDark: '#94849c', roof: '#4a3d5e', roofDark: '#352c44',
@@ -251,8 +251,8 @@ export const BUILDINGS: Building[] = [
     intro:
       "Freud and I parted ways, you know — he saw the basement, I looked at the *foundations* we all share. The Shadow, the Anima, the Wise Old One: these are not yours alone, they are humanity's furniture. Draw a card; meet a piece of yourself.",
     hookDescription:
-      "Draw archetype cards from a collective deck; a balanced hand reveals a playful, non-diagnostic motif.",
-    hookKind: 'stub',
+      'Draw archetype cards from the collective deck and swap toward balance; a whole hand reveals a playful, non-diagnostic motif.',
+    hookKind: 'jung-deck',
     unlockCost: 30,
     palette: {
       wall: '#a9b8c6', wallDark: '#86949f', roof: '#3d5a6b', roofDark: '#2c424f',
@@ -329,8 +329,8 @@ export const BUILDINGS: Building[] = [
     intro:
       "However you arrived today — tired, proud, ashamed — you are welcome here exactly as you are. I won't fix you; I'll *listen* until you hear yourself. That's the whole therapy: warmth, honesty, and no conditions on my regard for you.",
     hookDescription:
-      'A rest hub: signing the regard guestbook with reflective prompts boosts relationships with other NPCs.',
-    hookKind: 'stub',
+      'Greet guests at the regard guestbook and pick the response that truly listens — reflection over advice or judgment.',
+    hookKind: 'rogers-guestbook',
     unlockCost: 42,
     palette: {
       wall: '#e2cf9c', wallDark: '#c2ad77', roof: '#5a8a6a', roofDark: '#426650',
@@ -368,8 +368,8 @@ export const BUILDINGS: Building[] = [
     intro:
       "Children are not tiny adults — they think in *stages*, each with its own logic. Show a small one two equal glasses, pour one into a taller cup, and they'll swear it grew. Marvelous! Come, let's sort the world the way a growing mind does.",
     hookDescription:
-      'Sort tasks into the correct developmental stage; mastering conservation puzzles unlocks tutoring quests.',
-    hookKind: 'stub',
+      'Sort what each child is doing onto the right developmental stage — conservation slips, pretend horses, and all.',
+    hookKind: 'piaget-sort',
     unlockCost: 48,
     palette: {
       wall: '#d6c08a', wallDark: '#b4a06d', roof: '#b5662f', roofDark: '#8c4e23',
@@ -408,7 +408,7 @@ export const BUILDINGS: Building[] = [
       "You don't have to be rewarded to learn — you can just *watch*. My famous inflatable doll showed how children copy what they see, aggression and all. In here, you'll learn by modeling: attend, remember, reproduce, and stay motivated.",
     hookDescription:
       "Watch the trainer's combo, then reproduce it from memory (modeling), building self-efficacy XP.",
-    hookKind: 'stub',
+    hookKind: 'bandura-model',
     unlockCost: 54,
     palette: {
       wall: '#bfa98a', wallDark: '#9b8769', roof: '#6a6a72', roofDark: '#4d4d54',
@@ -485,8 +485,8 @@ export const BUILDINGS: Building[] = [
     intro:
       "Memory isn't a recording — it's a reconstruction, and I can prove it. Tell me how fast the cars were going when they *smashed*... or did they merely *contact*? Watch your memory bend to my question. Step into the darkroom; let's develop what really happened.",
     hookDescription:
-      'Develop a witnessed scene, then answer leading questions — your recalled photo visibly changes.',
-    hookKind: 'stub',
+      'Witness a street scene, then answer an interview whose leading questions quietly rewrite your photo.',
+    hookKind: 'loftus-photo',
     unlockCost: 66,
     palette: {
       wall: '#b6a9a0', wallDark: '#928680', roof: '#5a4a5a', roofDark: '#423644',
@@ -524,8 +524,8 @@ export const BUILDINGS: Building[] = [
     intro:
       "Take the stage! When the whole crowd swears the short line is longest, will you agree just to fit in? And when a stern voice tells you to keep going past your comfort — where, exactly, do you stop? We perform these classics here, safely, so you can feel the pull and choose your footing.",
     hookDescription:
-      'Conformity & obedience mini-dramas staged as theater with no real distress; the ethics overhaul is the lesson.',
-    hookKind: 'stub',
+      'Judge line lengths while a planted audience answers first — and wrong. No real distress; the ethics overhaul is the lesson.',
+    hookKind: 'asch-stage',
     unlockCost: 72,
     palette: {
       wall: '#c0a878', wallDark: '#9e885c', roof: '#7a4a3a', roofDark: '#5c372b',
