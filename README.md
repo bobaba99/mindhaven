@@ -1,5 +1,7 @@
 # Mindhaven 🧠🏘️
 
+**▶ Play it now: [mindhaven-game.vercel.app](https://mindhaven-game.vercel.app)** — free, in your browser, desktop or phone.
+
 A cozy, **Stardew Valley–style pixel-art educational game**. Stroll **Wundt
 Way**, a single Main Street that is a walkable history of psychology: each of
 14 building facades is run by a famous psychologist who greets you in
