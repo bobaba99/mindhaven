@@ -70,6 +70,24 @@ describe('useTypewriter', () => {
     expect(result.current.shown).toBe(TEXT)
   })
 
+  it('fires onTick as characters land, throttled by tickEvery', () => {
+    const onTick = vi.fn()
+    renderHook(() => useTypewriter(TEXT, 50, { onTick, tickEvery: 5 }))
+    flushFrame(200) // 10 chars revealed -> ticks at the 5- and 10-char marks
+    expect(onTick).toHaveBeenCalledTimes(2)
+    flushFrame(10_000) // full 24 chars -> marks 15 and 20 (not a 25th)
+    expect(onTick).toHaveBeenCalledTimes(4)
+  })
+
+  it('does not tick when skipping or under reduced motion', () => {
+    const onTick = vi.fn()
+    const { result } = renderHook(() => useTypewriter(TEXT, 50, { onTick, tickEvery: 5 }))
+    act(() => {
+      result.current.skip()
+    })
+    expect(onTick).not.toHaveBeenCalled()
+  })
+
   it('shows the full text immediately when the user prefers reduced motion', () => {
     vi.stubGlobal('matchMedia', (query: string) => ({
       matches: query.includes('prefers-reduced-motion'),

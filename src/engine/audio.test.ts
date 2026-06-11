@@ -31,6 +31,10 @@ describe('playSfx resilience', () => {
     expect(() => playSfx('insight')).not.toThrow()
     expect(() => playSfx('unlock')).not.toThrow()
     expect(() => playSfx('locked')).not.toThrow()
+    expect(() => playSfx('flip')).not.toThrow()
+    expect(() => playSfx('match')).not.toThrow()
+    expect(() => playSfx('miss')).not.toThrow()
+    expect(() => playSfx('tick')).not.toThrow()
   })
 
   it('never throws while muted either', () => {

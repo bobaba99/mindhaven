@@ -1,3 +1,4 @@
+import { playSfx } from '../engine/audio'
 import { useTypewriter } from '../hooks/useTypewriter'
 import type { MiniLecture } from '../data/types'
 
@@ -15,7 +16,9 @@ export function LecturePanel({
   onComplete,
   onBack,
 }: LecturePanelProps) {
-  const { shown, done, skip } = useTypewriter(lecture.blurb)
+  const { shown, done, skip } = useTypewriter(lecture.blurb, 55, {
+    onTick: () => playSfx('tick'),
+  })
 
   return (
     <div className="lecture-panel">

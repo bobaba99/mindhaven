@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { shuffle } from '../../engine/shuffle'
+import { playSfx } from '../../engine/audio'
 
 interface MemoryGameProps {
   onSuccess: () => void
 }
 
-/** ms a mismatched pair stays face-up before flipping back. */
-const MISMATCH_FLIP_BACK_MS = 700
+/** ms a mismatched pair stays face-up (mid-shake) before flipping back. */
+const MISMATCH_FLIP_BACK_MS = 850
 
 /** Calkins paired-associate pairs: a cue and its learned partner. */
 const PAIRS: Array<[string, string]> = [
@@ -36,6 +37,7 @@ export function MemoryGame({ onSuccess }: MemoryGameProps) {
   const [deck, setDeck] = useState<Card[]>(() => buildDeck())
   const [flipped, setFlipped] = useState<number[]>([])
   const [matched, setMatched] = useState<Set<number>>(new Set())
+  const [missed, setMissed] = useState<number[]>([])
   const [moves, setMoves] = useState(0)
   const won = matched.size === deck.length
   const flipBackTimer = useRef<number>(0)
@@ -51,6 +53,7 @@ export function MemoryGame({ onSuccess }: MemoryGameProps) {
     if (won || flipped.includes(idx) || matched.has(idx)) return
     if (flipped.length === 2) return
 
+    playSfx('flip')
     const next = [...flipped, idx]
     setFlipped(next)
     if (next.length === 2) {
@@ -62,20 +65,25 @@ export function MemoryGame({ onSuccess }: MemoryGameProps) {
         m2.add(b)
         setMatched(m2)
         setFlipped([])
+        playSfx('match')
         if (m2.size === deck.length) onSuccess()
       } else {
-        flipBackTimer.current = window.setTimeout(
-          () => setFlipped([]),
-          MISMATCH_FLIP_BACK_MS,
-        )
+        setMissed(next)
+        playSfx('miss')
+        flipBackTimer.current = window.setTimeout(() => {
+          setFlipped([])
+          setMissed([])
+        }, MISMATCH_FLIP_BACK_MS)
       }
     }
   }
 
   const reset = () => {
+    playSfx('flip')
     setDeck(buildDeck())
     setFlipped([])
     setMatched(new Set())
+    setMissed([])
     setMoves(0)
   }
 
@@ -87,17 +95,26 @@ export function MemoryGame({ onSuccess }: MemoryGameProps) {
       </p>
       <div className="memory-grid">
         {deck.map((card, idx) => {
-          const show = flipped.includes(idx) || matched.has(idx)
+          const up = flipped.includes(idx) || matched.has(idx)
+          const state = `${up ? ' memory-card--up' : ''}${
+            matched.has(idx) ? ' memory-card--done' : ''
+          }${missed.includes(idx) ? ' memory-card--miss' : ''}`
           return (
             <button
               key={card.id}
-              className={`memory-card${show ? ' memory-card--up' : ''}${
-                matched.has(idx) ? ' memory-card--done' : ''
-              }`}
+              className={`memory-card${state}`}
               onClick={() => click(idx)}
               disabled={won}
+              aria-label={up ? card.label : 'Face-down card'}
             >
-              {show ? card.label : '?'}
+              <span className="memory-card__inner">
+                <span className="memory-card__face memory-card__face--back" aria-hidden="true">
+                  ?
+                </span>
+                <span className="memory-card__face memory-card__face--front">
+                  {card.label}
+                </span>
+              </span>
             </button>
           )
         })}

@@ -3,7 +3,16 @@
  * oscillators (no audio assets, matching the all-procedural art rule).
  * Every call is failure-safe: no AudioContext, no sound, no crash.
  */
-export type SfxName = 'blip' | 'chime' | 'insight' | 'unlock' | 'locked'
+export type SfxName =
+  | 'blip'
+  | 'chime'
+  | 'insight'
+  | 'unlock'
+  | 'locked'
+  | 'flip'
+  | 'match'
+  | 'miss'
+  | 'tick'
 
 export const MUTE_STORAGE_KEY = 'mindhaven.muted.v1'
 
@@ -90,6 +99,24 @@ const RECIPES: Record<SfxName, Note[]> = {
     { freq: 130.8, at: 0, dur: 0.12, type: 'square', vol: 0.05 },
     { freq: 98, at: 0.1, dur: 0.16, type: 'square', vol: 0.045 },
   ],
+  // card flicks over: quick upward swish
+  flip: [
+    { freq: 520, at: 0, dur: 0.05, type: 'triangle', vol: 0.035 },
+    { freq: 780, at: 0.035, dur: 0.07, type: 'triangle', vol: 0.03 },
+  ],
+  // pair found: bright little arpeggio
+  match: [
+    { freq: 880, at: 0, dur: 0.1, type: 'sine', vol: 0.05 },
+    { freq: 1108.7, at: 0.08, dur: 0.12, type: 'sine', vol: 0.05 },
+    { freq: 1318.5, at: 0.16, dur: 0.2, type: 'sine', vol: 0.045 },
+  ],
+  // not a pair: gentle low shrug
+  miss: [
+    { freq: 233.1, at: 0, dur: 0.09, type: 'triangle', vol: 0.04 },
+    { freq: 185, at: 0.07, dur: 0.13, type: 'triangle', vol: 0.035 },
+  ],
+  // typewriter key landing — kept nearly subliminal
+  tick: [{ freq: 1850, at: 0, dur: 0.018, type: 'square', vol: 0.012 }],
 }
 
 /** Fire-and-forget a named sound effect. Silent when muted or unsupported. */

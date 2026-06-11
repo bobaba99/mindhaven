@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { Building } from '../data/types'
+import { playSfx } from '../engine/audio'
 import { useTypewriter } from '../hooks/useTypewriter'
 import { NpcAvatar } from './NpcAvatar'
 import { LecturePanel } from './LecturePanel'
@@ -31,7 +32,9 @@ export function DialoguePanel({
 }: DialoguePanelProps) {
   const [tab, setTab] = useState<Tab>('intro')
   const [openLecture, setOpenLecture] = useState<string | null>(null)
-  const { shown, done, skip } = useTypewriter(building.intro, 50)
+  const { shown, done, skip } = useTypewriter(building.intro, 50, {
+    onTick: () => playSfx('tick'),
+  })
   const panelRef = useRef<HTMLDivElement>(null)
 
   // Grant intro Insight the first time this panel mounts for the building.
