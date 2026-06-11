@@ -16,6 +16,7 @@ import {
 } from '../engine/townsfolk'
 import { nearestBuildingId } from '../engine/proximity'
 import { renderStaticWorld } from '../engine/renderTown'
+import { drawSignOverlay } from '../engine/signOverlay'
 import { drawPlayer, drawTownsperson } from '../art/drawSprites'
 
 interface UseGameLoopArgs {
@@ -60,8 +61,11 @@ export function useGameLoop({
 
   // (Re)build the cached static world whenever unlock state changes.
   // The draw loop reads staticRef each frame, so no re-render is needed.
+  const unlockedSetRef = useRef<ReadonlySet<string>>(new Set(unlockedIds))
   useEffect(() => {
-    staticRef.current = renderStaticWorld(new Set(unlockedIds))
+    const set = new Set(unlockedIds)
+    unlockedSetRef.current = set
+    staticRef.current = renderStaticWorld(set)
   }, [unlockedIds])
 
   // input
@@ -147,6 +151,14 @@ export function useGameLoop({
       drawPlayer(ctx, p.x, p.y, p.facing, walkStep(p))
 
       ctx.restore()
+
+      // crisp text pass: building names + lock costs at device resolution
+      drawSignOverlay(ctx, {
+        camX,
+        dpr,
+        viewCssW: cssW,
+        unlockedIds: unlockedSetRef.current,
+      })
     }
 
     raf = requestAnimationFrame(tick)

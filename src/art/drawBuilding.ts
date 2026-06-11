@@ -142,14 +142,8 @@ function drawSign(ctx: Ctx, building: Building, x: number, bodyTop: number, w: n
   const sh = 11
   px(ctx, sx, sy, sw, sh, '#3a2a1a')
   px(ctx, sx + 1, sy + 1, sw - 2, sh - 2, building.palette.accent)
-  ctx.fillStyle = '#2a1c10'
-  ctx.font = '7px "Courier New", monospace'
-  ctx.textAlign = 'center'
-  ctx.textBaseline = 'middle'
-  const label = building.figure.split('&')[0].trim()
-  ctx.fillText(label, sx + sw / 2, sy + sh / 2 + 1, sw - 4)
-  ctx.textAlign = 'left'
-  ctx.textBaseline = 'alphabetic'
+  // NOTE: the name itself is drawn by the crisp device-resolution overlay
+  // (engine/signOverlay.ts) — text rasterized at 1x then upscaled reads as mud.
 }
 
 function drawVariant(
@@ -306,7 +300,7 @@ function drawLockOverlay(
   y: number,
   w: number,
   h: number,
-  cost: number,
+  _cost: number,
 ) {
   ctx.fillStyle = 'rgba(20,16,12,0.55)'
   ctx.fillRect(x - 3, y - 18, w + 6, h + 20)
@@ -323,10 +317,5 @@ function drawLockOverlay(
   ctx.stroke()
   // keyhole
   px(ctx, cx - 1, cy + 3, 2, 4, '#5a4420')
-  // cost label
-  ctx.fillStyle = '#ffe6a0'
-  ctx.font = '7px "Courier New", monospace'
-  ctx.textAlign = 'center'
-  ctx.fillText(`${cost} ◆`, cx, cy + 18)
-  ctx.textAlign = 'left'
+  // cost label drawn by the crisp overlay (engine/signOverlay.ts)
 }
