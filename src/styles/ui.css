@@ -1331,6 +1331,193 @@
   transform: translateX(4px);
 }
 
+/* ---------- The Wundt Way Gazette (version news as newsprint) ---------- */
+.gazette {
+  position: relative;
+  width: min(720px, 96vw);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background:
+    linear-gradient(rgba(255, 252, 240, 0.96), rgba(248, 241, 220, 0.96));
+}
+
+.gazette .dialogue__close {
+  z-index: 2;
+}
+
+.gazette__masthead {
+  text-align: center;
+  padding: 14px 18px 10px;
+  border-bottom: 3px double #2a2018;
+  margin: 0 14px;
+}
+
+.gazette__ears {
+  display: flex;
+  justify-content: space-between;
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 11px;
+  font-style: italic;
+  color: #5a4a32;
+}
+
+.gazette__name {
+  margin: 2px 0 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-variant: small-caps;
+  letter-spacing: 2px;
+  font-size: 34px;
+  color: #2a2018;
+}
+
+.gazette__motto {
+  margin: 0;
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 12px;
+  color: #5a4a32;
+}
+
+.gazette__dateline {
+  margin: 6px 0 0;
+  padding-top: 5px;
+  border-top: 1px solid #2a2018;
+  font-family: Georgia, serif;
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #3a2c1c;
+}
+
+.gazette__body {
+  overflow-y: auto;
+  padding: 12px 28px 18px;
+}
+
+.gazette__headline {
+  margin: 4px 0 2px;
+  text-align: center;
+  font-family: Georgia, serif;
+  font-weight: 900;
+  font-size: 30px;
+  line-height: 1.15;
+  letter-spacing: 0.5px;
+  color: #1c1410;
+}
+
+.gazette__subhead {
+  margin: 0 auto 14px;
+  max-width: 56ch;
+  text-align: center;
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 15px;
+  line-height: 1.45;
+  color: #3a2c1c;
+  border-bottom: 1px solid #6b5a40;
+  padding-bottom: 12px;
+}
+
+.gazette__columns {
+  column-count: 2;
+  column-gap: 26px;
+  column-rule: 1px solid #c9b89a;
+}
+
+@media (max-width: 620px) {
+  .gazette__columns {
+    column-count: 1;
+  }
+}
+
+.gazette__article {
+  break-inside: avoid;
+  margin-bottom: 16px;
+}
+
+.gazette__kicker {
+  margin: 0 0 1px;
+  font-family: Georgia, serif;
+  font-size: 10.5px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  color: #8a5220;
+}
+
+.gazette__article h4 {
+  margin: 0 0 5px;
+  font-family: Georgia, serif;
+  font-size: 17px;
+  line-height: 1.25;
+  color: #1c1410;
+}
+
+.gazette__article p {
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: #2a2018;
+  text-align: justify;
+  hyphens: auto;
+}
+
+.gazette__article:first-of-type p::first-letter {
+  float: left;
+  font-size: 40px;
+  line-height: 0.85;
+  padding: 3px 6px 0 0;
+  font-family: Georgia, serif;
+  color: #8a5220;
+}
+
+.gazette__foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 0 14px;
+  padding: 8px 4px 10px;
+  border-top: 3px double #2a2018;
+}
+
+.gazette__byline {
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-size: 11.5px;
+  color: #5a4a32;
+}
+
+.gazette__issue-btn {
+  background: none;
+  border: 1px solid #6b5a40;
+  font-family: Georgia, serif;
+  font-size: 11px;
+  padding: 2px 8px;
+  color: #3a2c1c;
+  margin-left: 4px;
+}
+
+.gazette__issue-btn.is-active {
+  background: #2a2018;
+  color: #f4e7cd;
+}
+
+.title-screen__actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.title-screen__gazette {
+  font-size: 13px;
+  padding: 12px 16px;
+}
+
 /* ---------- First-run tour toast ---------- */
 @keyframes toast-in {
   from {

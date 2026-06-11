@@ -24,6 +24,7 @@ import { DialoguePanel } from './components/DialoguePanel'
 import { LockedModal } from './components/LockedModal'
 import { Journal } from './components/Journal'
 import { LectureRevisit } from './components/LectureRevisit'
+import { GazettePanel } from './components/GazettePanel'
 import { SettingsPanel } from './components/SettingsPanel'
 import { TitleScreen } from './components/TitleScreen'
 import { TourToast } from './components/TourToast'
@@ -39,6 +40,7 @@ type Overlay =
   | { kind: 'journal' }
   | { kind: 'revisit'; lecture: MiniLecture }
   | { kind: 'settings' }
+  | { kind: 'gazette' }
 
 export function App() {
   const [started, setStarted] = useState(false)
@@ -187,6 +189,7 @@ export function App() {
         muted={muted}
         onToggleMute={toggleMute}
         onOpenSettings={() => setOverlay({ kind: 'settings' })}
+        onOpenGazette={() => setOverlay({ kind: 'gazette' })}
         onOpenJournal={() => setOverlay({ kind: 'journal' })}
       />
 
@@ -258,6 +261,8 @@ export function App() {
           onClose={closeOverlay}
         />
       )}
+
+      {overlay.kind === 'gazette' && <GazettePanel onClose={closeOverlay} />}
     </div>
   )
 }

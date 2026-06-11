@@ -1,4 +1,5 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { GazettePanel } from './GazettePanel'
 
 interface TitleScreenProps {
   onStart: () => void
@@ -14,8 +15,12 @@ const CONTROLS: Array<{ what: string; keys: string[]; note?: string }> = [
 
 /** Cozy title card shown before entering the town. */
 export function TitleScreen({ onStart, hasProgress }: TitleScreenProps) {
-  // Enter / Space starts the game without needing to focus the button first.
+  const [readingGazette, setReadingGazette] = useState(false)
+
+  // Enter / Space starts the game without needing to focus the button first
+  // (suspended while the Gazette is open so it can use its own keys).
   useEffect(() => {
+    if (readingGazette) return
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault()
@@ -24,7 +29,7 @@ export function TitleScreen({ onStart, hasProgress }: TitleScreenProps) {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [onStart])
+  }, [onStart, readingGazette])
 
   return (
     <div className="title-screen">
@@ -68,10 +73,17 @@ export function TitleScreen({ onStart, hasProgress }: TitleScreenProps) {
           </p>
         )}
 
-        <button className="pixel-btn pixel-btn--primary title-screen__start" onClick={onStart}>
-          {hasProgress ? 'Continue your stroll ▸' : 'Enter Mindhaven ▸'}
-        </button>
+        <div className="title-screen__actions">
+          <button className="pixel-btn pixel-btn--primary title-screen__start" onClick={onStart}>
+            {hasProgress ? 'Continue your stroll ▸' : 'Enter Mindhaven ▸'}
+          </button>
+          <button className="pixel-btn title-screen__gazette" onClick={() => setReadingGazette(true)}>
+            📰 The Gazette
+          </button>
+        </div>
       </div>
+
+      {readingGazette && <GazettePanel onClose={() => setReadingGazette(false)} />}
     </div>
   )
 }

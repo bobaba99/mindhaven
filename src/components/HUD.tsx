@@ -8,6 +8,7 @@ interface HUDProps {
   muted: boolean
   onToggleMute: () => void
   onOpenSettings: () => void
+  onOpenGazette: () => void
   onOpenJournal: () => void
 }
 
@@ -20,6 +21,7 @@ export function HUD({
   muted,
   onToggleMute,
   onOpenSettings,
+  onOpenGazette,
   onOpenJournal,
 }: HUDProps) {
   return (
@@ -58,6 +60,14 @@ export function HUD({
           title="Text size & weight"
         >
           ⚙
+        </button>
+        <button
+          className="pixel-btn hud__journal"
+          onClick={onOpenGazette}
+          aria-label="Read the Wundt Way Gazette (version news)"
+          title="The Gazette — town news & updates"
+        >
+          📰
         </button>
         <button className="pixel-btn hud__journal" onClick={onOpenJournal}>
           Journal (J)
