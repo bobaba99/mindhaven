@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { SCALE, WORLD_W, PLAYER_W } from '../engine/world'
-import { createInput } from '../engine/input'
+import { createInput, type InputController, type MoveKey } from '../engine/input'
+import type { TouchControlsHandle } from '../components/TouchControls'
 import {
   spawnPlayer,
   stepPlayer,
@@ -32,7 +33,8 @@ interface UseGameLoopArgs {
 /**
  * Drives the whole town: an rAF loop that steps the player + townsfolk, draws
  * the cached static world plus animated sprites, and runs a side-scrolling
- * camera that keeps the player roughly centered.
+ * camera that keeps the player roughly centered. Returns a stable handle the
+ * touch controls can drive (it proxies to the live input controller).
  */
 export function useGameLoop({
   canvasRef,
@@ -40,12 +42,13 @@ export function useGameLoop({
   paused,
   onInteract,
   onNearChange,
-}: UseGameLoopArgs) {
+}: UseGameLoopArgs): TouchControlsHandle {
   const playerRef = useRef<PlayerState>(spawnPlayer())
   const folkRef = useRef<WandererState[]>(spawnTownsfolk())
   const nearRef = useRef<string | null>(null)
   const staticRef = useRef<HTMLCanvasElement | null>(null)
   const pausedRef = useRef(paused)
+  const inputRef = useRef<InputController | null>(null)
 
   // keep mutable refs in sync with props without restarting the loop
   pausedRef.current = paused
@@ -70,6 +73,7 @@ export function useGameLoop({
         if (near) onInteractRef.current(near)
       },
     })
+    inputRef.current = input
 
     let raf = 0
     let last = performance.now()
@@ -149,10 +153,19 @@ export function useGameLoop({
     return () => {
       cancelAnimationFrame(raf)
       input.dispose()
+      inputRef.current = null
     }
     // canvasRef is stable; loop reads everything else via refs
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Stable proxy so TouchControls never re-renders when the input rebinds.
+  const touchHandleRef = useRef<TouchControlsHandle>({
+    press: (key: MoveKey) => inputRef.current?.press(key),
+    release: (key: MoveKey) => inputRef.current?.release(key),
+    interact: () => inputRef.current?.interact(),
+  })
+  return touchHandleRef.current
 }
 
 function clamp(v: number, lo: number, hi: number): number {

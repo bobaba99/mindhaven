@@ -24,16 +24,41 @@ const KEY_MAP: Record<string, MoveKey> = {
 
 const INTERACT_KEYS = new Set(['e', 'E', 'Enter', ' '])
 
+export interface InputController {
+  state: InputState
+  /** Programmatic press (touch D-pad). Ignored while disabled. */
+  press: (key: MoveKey) => void
+  /** Programmatic release. Always lands, so touch keys can never stick. */
+  release: (key: MoveKey) => void
+  /** Programmatic interact (touch button). Respects the enabled gate. */
+  interact: () => void
+  dispose: () => void
+}
+
 /**
- * Keyboard input controller. Tracks held movement keys and fires a callback on
- * the interact key. Returns a disposer. `enabled` lets callers freeze movement
- * while an overlay is open (we still read interact via React there).
+ * Input controller for keyboard AND programmatic (touch) sources. Tracks held
+ * movement keys and fires a callback on interact. Returns a disposer.
+ * `enabled` lets callers freeze movement while an overlay is open.
  */
 export function createInput(opts: {
   onInteract: () => void
   isEnabled: () => boolean
-}): { state: InputState; dispose: () => void } {
+}): InputController {
   const state: InputState = { up: false, down: false, left: false, right: false }
+
+  const press = (key: MoveKey) => {
+    if (!opts.isEnabled()) return
+    state[key] = true
+  }
+
+  const release = (key: MoveKey) => {
+    state[key] = false
+  }
+
+  const interact = () => {
+    if (!opts.isEnabled()) return
+    opts.onInteract()
+  }
 
   const handleDown = (e: KeyboardEvent) => {
     if (!opts.isEnabled()) return
@@ -68,6 +93,9 @@ export function createInput(opts: {
 
   return {
     state,
+    press,
+    release,
+    interact,
     dispose: () => {
       window.removeEventListener('keydown', handleDown)
       window.removeEventListener('keyup', handleUp)

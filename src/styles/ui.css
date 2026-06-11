@@ -1054,6 +1054,112 @@
   color: #3a2410;
 }
 
+/* ---------- Crash card (error boundary) ---------- */
+.crash-card {
+  width: min(480px, 94vw);
+  background: var(--panel);
+  padding: 24px;
+  text-align: center;
+}
+
+.crash-card h1 {
+  margin: 0 0 10px;
+  font-size: 22px;
+  color: var(--accent-deep);
+}
+
+.crash-card p {
+  font-size: 14px;
+  line-height: 1.55;
+  color: #2e2218;
+}
+
+.crash-card__actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 14px 0;
+  flex-wrap: wrap;
+}
+
+.crash-card__note {
+  font-size: 12px;
+  color: #6a5230;
+}
+
+/* ---------- Touch controls (coarse pointers only) ---------- */
+.touch-controls {
+  display: none;
+}
+
+.only-coarse-pointer {
+  display: none;
+}
+
+@media (pointer: coarse) {
+  .touch-controls {
+    display: block;
+  }
+
+  .only-coarse-pointer {
+    display: inline-block;
+  }
+
+  .only-fine-pointer {
+    display: none;
+  }
+}
+
+.touch-dpad {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  display: grid;
+  grid-template-areas:
+    '. up .'
+    'left . right'
+    '. down .';
+  gap: 6px;
+  z-index: 6;
+}
+
+.touch-dpad__up { grid-area: up; }
+.touch-dpad__down { grid-area: down; }
+.touch-dpad__left { grid-area: left; }
+.touch-dpad__right { grid-area: right; }
+
+.touch-btn {
+  width: 56px;
+  height: 56px;
+  border: 3px solid #2c1d0e;
+  background: rgba(28, 20, 12, 0.55);
+  color: var(--parchment);
+  font-size: 20px;
+  font-family: var(--font-pixel);
+  border-radius: 10px;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.touch-btn:active {
+  background: rgba(201, 162, 75, 0.75);
+  color: #2c1d0e;
+}
+
+.touch-interact {
+  position: absolute;
+  right: 18px;
+  bottom: 26px;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  font-size: 26px;
+  border-color: var(--gold);
+  z-index: 6;
+}
+
 /* ---------- Responsive niceties ---------- */
 @media (max-width: 520px) {
   .hud__title { font-size: 16px; }

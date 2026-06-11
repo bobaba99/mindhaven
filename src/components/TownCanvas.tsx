@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { SCALE, WORLD_H } from '../engine/world'
 import { useGameLoop } from '../hooks/useGameLoop'
 import { InteractPrompt } from './InteractPrompt'
+import { TouchControls } from './TouchControls'
 import { BUILDINGS } from '../data/buildings'
 
 const BUILDING_NAME = new Map(BUILDINGS.map((b) => [b.id, b.name]))
@@ -45,7 +46,7 @@ export function TownCanvas({ unlockedIds, paused, onInteract }: TownCanvasProps)
     return () => window.removeEventListener('resize', resize)
   }, [])
 
-  useGameLoop({
+  const touch = useGameLoop({
     canvasRef,
     unlockedIds,
     paused,
@@ -62,6 +63,7 @@ export function TownCanvas({ unlockedIds, paused, onInteract }: TownCanvasProps)
           locked={!unlockedIds.includes(near)}
         />
       )}
+      {!paused && <TouchControls controls={touch} />}
     </div>
   )
 }

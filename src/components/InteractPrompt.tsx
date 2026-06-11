@@ -13,7 +13,8 @@ export function InteractPrompt({ label, locked }: InteractPromptProps) {
       role="status"
       aria-live="polite"
     >
-      <kbd>E</kbd>
+      <kbd className="only-fine-pointer">E</kbd>
+      <kbd className="only-coarse-pointer" aria-hidden="true">✦</kbd>
       <span>
         {locked ? 'Inspect (locked) ' : 'Enter '}
         <strong>{label}</strong>
