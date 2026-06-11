@@ -1251,6 +1251,260 @@
   justify-content: flex-end;
 }
 
+/* ---------- Premium motion (industry-standard micro-interactions) ----------
+   Durations 150-250ms, ease-out entrances, gentle overshoot on panels.
+   Everything here is decorative and fully disabled under reduced motion. */
+
+@keyframes overlay-in {
+  from { opacity: 0; }
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+}
+
+.overlay {
+  animation: overlay-in 0.16s ease-out;
+}
+
+.overlay > * {
+  animation: panel-in 0.22s cubic-bezier(0.2, 0.9, 0.3, 1.06);
+}
+
+/* tab/content switches inside panels */
+@keyframes tab-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.tab-fade {
+  animation: tab-fade-in 0.18s ease-out;
+}
+
+/* HUD Insight pops when the number changes (key= remounts the span) */
+@keyframes insight-pop {
+  0% {
+    transform: scale(1.5);
+    color: #fff3c4;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.hud__insight-num {
+  display: inline-block;
+  animation: insight-pop 0.35s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+/* lecture list rows nudge on hover */
+.lecture-list__item {
+  transition: transform 0.13s ease, box-shadow 0.13s ease, background 0.13s ease;
+}
+
+.lecture-list__item:hover {
+  transform: translateX(4px);
+  box-shadow: -3px 3px 0 0 #b89a5e;
+}
+
+/* completed-lecture button gets a settle pop */
+@keyframes banked-pop {
+  0% { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
+.lecture-panel__actions .is-done {
+  animation: banked-pop 0.3s ease-out;
+}
+
+/* journal lecture rows */
+.journal__lecture {
+  transition: transform 0.13s ease;
+}
+
+.journal__lecture:hover {
+  transform: translateX(4px);
+}
+
+/* ---------- First-run tour toast ---------- */
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
+}
+
+.tour-toast {
+  position: absolute;
+  /* below the HUD bar so the Insight counter stays readable */
+  top: 62px;
+  left: 50%;
+  transform: translateX(-50%);
+  /* above panel overlays (20/30) — onboarding guidance stays visible while
+     the player follows it inside the dialogue */
+  z-index: 35;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: min(560px, 92vw);
+  background: rgba(28, 20, 12, 0.94);
+  border: 3px solid var(--gold);
+  color: var(--parchment);
+  padding: 10px 14px;
+  animation: toast-in 0.25s ease-out;
+}
+
+.tour-toast__dots {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.tour-toast__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #6b5a40;
+  border: 1px solid #2c1d0e;
+}
+
+.tour-toast__dot--past {
+  background: #8aa65a;
+}
+
+.tour-toast__dot--now {
+  background: var(--gold);
+  box-shadow: 0 0 6px 1px rgba(224, 184, 75, 0.7);
+}
+
+.tour-toast__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.tour-toast__text strong {
+  color: var(--gold);
+  font-size: 15px;
+}
+
+.tour-toast__skip {
+  flex-shrink: 0;
+  background: none;
+  border: 2px solid #6b5a40;
+  color: #cdc4b4;
+  font-family: var(--font-pixel);
+  font-size: 11px;
+  padding: 5px 9px;
+  align-self: flex-start;
+}
+
+.tour-toast__skip:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+/* ---------- Title screen: clear control rows + staggered entrance ---------- */
+.title-controls {
+  margin: 0 auto 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  max-width: 420px;
+  text-align: left;
+}
+
+.title-controls__row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.title-controls__what {
+  flex: 0 0 110px;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #5a4326;
+  text-align: right;
+}
+
+.title-controls__keys {
+  margin: 0;
+  font-size: 13px;
+  color: #3a2c1c;
+  font-family: var(--font-body);
+}
+
+.title-controls__keys kbd {
+  background: var(--gold);
+  color: #2c1d0e;
+  border: 2px solid #2c1d0e;
+  border-radius: 3px;
+  padding: 1px 7px;
+  font-family: var(--font-pixel);
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.title-controls__or,
+.title-controls__note {
+  color: #6a5230;
+  font-size: 12px;
+}
+
+.title-controls__touch {
+  margin: 0 0 14px;
+  font-size: 14px;
+  font-family: var(--font-body);
+  line-height: 1.5;
+  color: #3a2c1c;
+}
+
+.title-controls__touch kbd {
+  background: var(--gold);
+  border: 2px solid #2c1d0e;
+  border-radius: 50%;
+  padding: 1px 6px;
+}
+
+.title-screen__tour-note {
+  margin: 0 0 16px;
+  font-size: 13px;
+  font-family: var(--font-body);
+  color: #6a5230;
+  font-style: italic;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+
+.title-screen__card > * {
+  animation: rise-in 0.4s ease-out both;
+}
+
+.title-screen__card > *:nth-child(1) { animation-delay: 0.05s; }
+.title-screen__card > *:nth-child(2) { animation-delay: 0.12s; }
+.title-screen__card > *:nth-child(3) { animation-delay: 0.19s; }
+.title-screen__card > *:nth-child(4) { animation-delay: 0.26s; }
+.title-screen__card > *:nth-child(5) { animation-delay: 0.33s; }
+.title-screen__card > *:nth-child(6) { animation-delay: 0.4s; }
+.title-screen__card > *:nth-child(7) { animation-delay: 0.47s; }
+
 /* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   .interact-prompt,
@@ -1258,12 +1512,21 @@
   .maslow-cake--topple,
   .memory-card--done .memory-card__face--front,
   .memory-card--miss .memory-card__inner,
+  .overlay,
+  .overlay > *,
+  .tab-fade,
+  .hud__insight-num,
+  .lecture-panel__actions .is-done,
+  .tour-toast,
+  .title-screen__card > *,
   .caret {
     animation: none;
   }
 
   .pixel-btn,
-  .memory-card__inner {
+  .memory-card__inner,
+  .lecture-list__item,
+  .journal__lecture {
     transition: none;
   }
 }

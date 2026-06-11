@@ -126,6 +126,7 @@ export function DialoguePanel({
         </nav>
 
         <div className="dialogue__body">
+          <div className="tab-fade" key={`${tab}:${openLecture ?? ''}`}>
           {tab === 'intro' && (
             <div
               className="dialogue__intro"
@@ -185,6 +186,7 @@ export function DialoguePanel({
           {tab === 'hook' && (
             <MinigameHost building={building} onHookComplete={onHookComplete} />
           )}
+          </div>
         </div>
 
         <footer className="dialogue__foot">

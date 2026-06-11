@@ -42,7 +42,7 @@ export function LecturePanel({
             onClick={onComplete}
             disabled={completed}
           >
-            {completed ? '✓ Completed (+0)' : 'Mark complete (+3 ◆)'}
+            {completed ? '✓ Banked +3 ◆' : 'Mark complete (+3 ◆)'}
           </button>
         )}
       </div>

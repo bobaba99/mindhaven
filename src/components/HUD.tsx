@@ -30,7 +30,11 @@ export function HUD({
       </div>
       <div className="hud__stats">
         <span className="hud__insight" title="Insight currency">
-          ◆ {insight} <small>Insight</small>
+          ◆{' '}
+          <span className="hud__insight-num" key={insight}>
+            {insight}
+          </span>{' '}
+          <small>Insight</small>
         </span>
         <span className="hud__chip">
           🏛 {buildingsUnlocked}/{totalBuildings}

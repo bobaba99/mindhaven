@@ -54,6 +54,7 @@ export function Journal({
         </nav>
 
         <div className="journal__body">
+          <div className="tab-fade" key={view}>
           {view === 'lectures' &&
             BUILDINGS.map((b) => {
               const unlocked = unlockedBuildings.includes(b.id)
@@ -106,6 +107,7 @@ export function Journal({
               ))}
             </ul>
           )}
+          </div>
         </div>
       </div>
     </div>
