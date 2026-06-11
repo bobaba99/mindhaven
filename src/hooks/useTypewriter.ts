@@ -25,7 +25,12 @@ export function useTypewriter(text: string, cps = 55) {
   }, [text, cps])
 
   const done = count >= text.length
-  const skip = () => setCount(text.length)
+  const skip = () => {
+    // Cancel the in-flight frame FIRST — otherwise its queued setCount(target)
+    // lands after ours and silently reverts the skip.
+    cancelAnimationFrame(rafRef.current)
+    setCount(text.length)
+  }
 
   return { shown: text.slice(0, count), done, skip }
 }

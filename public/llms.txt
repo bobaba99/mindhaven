@@ -1,0 +1,17 @@
+# Mindhaven
+
+> A free, browser-based, Stardew Valley–style pixel-art game that teaches the
+> history of psychology. The player strolls Wundt Way, a single main street
+> where each of 14 shops is run by a famous psychologist (Wundt, Calkins,
+> Pavlov, Skinner, Watson, Freud, Jung, Maslow, Rogers, Piaget, Bandura,
+> Kahneman & Tversky, Loftus, Asch & Milgram). Each shop offers an
+> in-character greeting, 2–3 accurate mini-lectures, and an interactive
+> activity drawn from the figure's real theory. Progress is gated by an
+> "Insight" score and saved locally in the browser.
+
+- All content is original; all pixel art and sound are generated procedurally in code.
+- No accounts, no tracking, no server: the game is a static single-page app.
+- Ethics-forward framing: Little Albert and Milgram are taught as cautionary
+  history; no distress is depicted or simulated.
+- Built with React + TypeScript + Vite. Keyboard (WASD/arrows + E) and touch
+  controls are both supported.

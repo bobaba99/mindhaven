@@ -84,8 +84,8 @@ export function WatsonGame({ onSuccess }: WatsonGameProps) {
       <p className="watson-ethics">
         Little Albert was taught fear and never deconditioned — that study is
         why ethics boards exist. Here, the same learning principle teaches
-        comfort instead. ({state.pairings} pairings, {state.calmResponses} calm
-        responses)
+        comfort instead. ({state.pairings} pairing{state.pairings === 1 ? '' : 's'},{' '}
+        {state.calmResponses} calm response{state.calmResponses === 1 ? '' : 's'})
       </p>
     </div>
   )

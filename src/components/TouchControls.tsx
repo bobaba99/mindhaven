@@ -29,12 +29,22 @@ export function TouchControls({ controls }: TouchControlsProps) {
   const hold = (key: MoveKey) => ({
     onPointerDown: (e: React.PointerEvent) => {
       e.preventDefault()
-      e.currentTarget.setPointerCapture(e.pointerId)
       controls.press(key)
+      // Capture AFTER pressing, and guarded: a capture failure (stale or
+      // synthetic pointer id) must never cost the player the input itself.
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId)
+      } catch {
+        // uncapturable pointer — release safety comes from pointerup/cancel
+      }
     },
     onPointerUp: (e: React.PointerEvent) => {
-      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
-        e.currentTarget.releasePointerCapture(e.pointerId)
+      try {
+        if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+          e.currentTarget.releasePointerCapture(e.pointerId)
+        }
+      } catch {
+        // already released — fine
       }
       controls.release(key)
     },

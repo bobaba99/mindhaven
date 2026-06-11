@@ -187,6 +187,8 @@
   margin: 0;
   font-size: 18px;
   color: #3a2410;
+  /* keep clear of the absolute-positioned close button */
+  padding-right: 30px;
 }
 
 .dialogue__sub {
@@ -1107,6 +1109,12 @@
 
   .only-fine-pointer {
     display: none;
+  }
+
+  /* Lift the interact prompt clear of the D-pad / interact button. */
+  .interact-prompt {
+    bottom: 210px;
+    max-width: 88vw;
   }
 }
 
