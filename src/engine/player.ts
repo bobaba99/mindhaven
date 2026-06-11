@@ -24,12 +24,17 @@ const WALK_MAX_X = WORLD_W - PLAYER_W - TILE * 0.5
 const WALK_MIN_Y = WALK_TOP_ROW * TILE
 const WALK_MAX_Y = (WALK_BOTTOM_ROW + 1) * TILE - PLAYER_H
 
-/** Where the player first spawns: in front of the Leipzig Lab, on the street. */
+/**
+ * Where the player first spawns: on the western edge of town, a short stroll
+ * WEST of the Leipzig Lab's door radius — so the first thing a new player does
+ * is walk (which is exactly what the first-run tour teaches), and the whole
+ * west→east timeline lies ahead of them.
+ */
 export function spawnPlayer(): PlayerState {
   return {
-    x: TILE * 6,
+    x: TILE * 1.5,
     y: WALK_MIN_Y + TILE * 1.5,
-    facing: 'down',
+    facing: 'right',
     animTime: 0,
     moving: false,
   }

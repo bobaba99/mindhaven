@@ -11,16 +11,25 @@ interface TownCanvasProps {
   unlockedIds: string[]
   paused: boolean
   onInteract: (buildingId: string) => void
+  /** Optional observer for the building currently in interact range. */
+  onNearChange?: (buildingId: string | null) => void
 }
 
 /**
  * Full-bleed canvas that renders Wundt Way. The canvas backing store is sized
  * to the viewport (times SCALE for crisp pixels); the camera scrolls the world.
  */
-export function TownCanvas({ unlockedIds, paused, onInteract }: TownCanvasProps) {
+export function TownCanvas({
+  unlockedIds,
+  paused,
+  onInteract,
+  onNearChange,
+}: TownCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const wrapRef = useRef<HTMLDivElement>(null)
   const [near, setNear] = useState<string | null>(null)
+  const onNearChangeRef = useRef(onNearChange)
+  onNearChangeRef.current = onNearChange
 
   // Resize the canvas. The CSS box is sized in logical (layout) pixels; the
   // backing store is logical × devicePixelRatio so pixel art stays crisp on
@@ -51,7 +60,10 @@ export function TownCanvas({ unlockedIds, paused, onInteract }: TownCanvasProps)
     unlockedIds,
     paused,
     onInteract,
-    onNearChange: setNear,
+    onNearChange: (id) => {
+      setNear(id)
+      onNearChangeRef.current?.(id)
+    },
   })
 
   return (

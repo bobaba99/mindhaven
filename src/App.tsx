@@ -9,6 +9,14 @@ import {
   saveSettings,
   type GameSettings,
 } from './engine/settings'
+import {
+  advanceTour,
+  initialTour,
+  isTourDone,
+  markTourDone,
+  type TourEvent,
+  type TourState,
+} from './engine/tour'
 import { useProgress } from './hooks/useProgress'
 import { TownCanvas } from './components/TownCanvas'
 import { HUD } from './components/HUD'
@@ -18,6 +26,7 @@ import { Journal } from './components/Journal'
 import { LectureRevisit } from './components/LectureRevisit'
 import { SettingsPanel } from './components/SettingsPanel'
 import { TitleScreen } from './components/TitleScreen'
+import { TourToast } from './components/TourToast'
 import './styles/ui.css'
 
 const BUILDING_BY_ID = new Map(BUILDINGS.map((b) => [b.id, b]))
@@ -36,6 +45,9 @@ export function App() {
   const [overlay, setOverlay] = useState<Overlay>({ kind: 'none' })
   const [muted, setMutedState] = useState(() => isMuted())
   const [settings, setSettings] = useState<GameSettings>(() => loadSettings())
+  const [tour, setTour] = useState<TourState>(() =>
+    isTourDone() ? { step: 'done', completed: true } : initialTour(),
+  )
   const { progress, readIntro, completeLecture, unlock, addInsight } = useProgress()
 
   // Track which buildings have already paid out their one-time hook Insight.
@@ -59,6 +71,56 @@ export function App() {
     saveSettings(next)
   }, [])
 
+  // --- first-run tour ---
+  const tourEvent = useCallback((event: TourEvent) => {
+    setTour((t) => {
+      const next = advanceTour(t, event)
+      if (next !== t) {
+        playSfx(next.completed ? 'chime' : 'blip')
+        if (next.completed) markTourDone()
+      }
+      return next
+    })
+  }, [])
+
+  // Step 1 (walk): any movement input — keyboard keys or the touch D-pad.
+  useEffect(() => {
+    if (!started || tour.step !== 'walk') return
+    const MOVE_KEYS = new Set([
+      'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+      'w', 'a', 's', 'd', 'W', 'A', 'S', 'D',
+    ])
+    const onKey = (e: KeyboardEvent) => {
+      if (MOVE_KEYS.has(e.key)) tourEvent('moved')
+    }
+    const onPointer = (e: PointerEvent) => {
+      if ((e.target as HTMLElement | null)?.closest('.touch-dpad')) tourEvent('moved')
+    }
+    window.addEventListener('keydown', onKey)
+    document.addEventListener('pointerdown', onPointer)
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.removeEventListener('pointerdown', onPointer)
+    }
+  }, [started, tour.step, tourEvent])
+
+  // Step 4 (earn): the first lecture completed after the tour begins. (The
+  // greeting's automatic +2 would finish this step before it could be read —
+  // the step exists to point players at the Lectures/Activity tabs.)
+  const tourBaseLectures = useRef(progress.completedLectures.length)
+  useEffect(() => {
+    if (!tour.completed && progress.completedLectures.length > tourBaseLectures.current) {
+      tourEvent('earned')
+    }
+  }, [progress.completedLectures.length, tour.completed, tourEvent])
+
+  const handleNearChange = useCallback(
+    (id: string | null) => {
+      if (id !== null) tourEvent('neared')
+    },
+    [tourEvent],
+  )
+
   const handleInteract = useCallback(
     (buildingId: string) => {
       const building = BUILDING_BY_ID.get(buildingId)
@@ -66,12 +128,13 @@ export function App() {
       if (isUnlocked(progress, buildingId)) {
         playSfx('blip')
         setOverlay({ kind: 'dialogue', building })
+        tourEvent('opened')
       } else {
         playSfx('locked')
         setOverlay({ kind: 'locked', building })
       }
     },
-    [progress],
+    [progress, tourEvent],
   )
 
   const handleHookComplete = useCallback(
@@ -80,8 +143,9 @@ export function App() {
       hookPaid.current.add(buildingId)
       addInsight(INSIGHT_PER_HOOK)
       playSfx('chime')
+      tourEvent('earned')
     },
-    [addInsight],
+    [addInsight, tourEvent],
   )
 
   // Ref mirror so the callback stays stable and closure-proof while still
@@ -131,8 +195,13 @@ export function App() {
           unlockedIds={unlockedIds}
           paused={paused}
           onInteract={handleInteract}
+          onNearChange={handleNearChange}
         />
       </main>
+
+      {started && !tour.completed && tour.step !== 'done' && (
+        <TourToast step={tour.step} onSkip={() => tourEvent('skip')} />
+      )}
 
       {!started && (
         <TitleScreen
