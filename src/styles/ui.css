@@ -592,36 +592,101 @@
 .reaction-lamp--go { background: #3a5a2a; }
 .reaction-lamp--tooSoon .reaction-lamp__bulb { background: #c14a3a; }
 
-/* Memory game */
+/* Memory game — true 3D card flip */
 .memory-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
+  gap: 10px;
 }
 
 .memory-card {
   aspect-ratio: 1;
+  border: none;
+  background: none;
+  padding: 0;
+  perspective: 700px;
+  cursor: pointer;
+}
+
+.memory-card__inner {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.25, 0.9, 0.3, 1.05);
+}
+
+.memory-card--up .memory-card__inner,
+.memory-card--done .memory-card__inner {
+  transform: rotateY(180deg);
+}
+
+/* gentle lift on hover while face-down */
+.memory-card:not(.memory-card--up):not(.memory-card--done):hover .memory-card__inner {
+  transform: translateY(-4px) rotateY(0deg);
+}
+
+.memory-card__face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
   border: 3px solid var(--panel-border);
-  background: var(--accent);
-  color: transparent;
-  font-size: 13px;
-  font-weight: bold;
+  border-radius: 6px;
   font-family: var(--font-pixel);
-  color: #2c1d0e;
+  font-weight: bold;
+  font-size: 15px;
 }
 
-.memory-card:not(.memory-card--up) {
-  color: #2c1d0e;
-  background: #8a6038;
+.memory-card__face--back {
+  background:
+    linear-gradient(135deg, #9a6f45 0%, #8a6038 55%, #745030 100%);
+  color: #f4e7cd;
+  font-size: 22px;
+  text-shadow: 1px 1px 0 #4a3422;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 240, 210, 0.25),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.25),
+    0 3px 0 0 #4a3422;
 }
 
-.memory-card--up {
+.memory-card__face--front {
+  transform: rotateY(180deg);
   background: var(--parchment);
+  color: #2c1d0e;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.5),
+    0 3px 0 0 #b89a5e;
 }
 
-.memory-card--done {
+.memory-card--done .memory-card__face--front {
   background: #6a9a4a;
   color: #fff;
+  animation: match-pulse 0.55s ease-out;
+}
+
+@keyframes match-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(106, 154, 74, 0.85);
+  }
+  100% {
+    box-shadow: 0 0 0 14px rgba(106, 154, 74, 0);
+  }
+}
+
+.memory-card--miss .memory-card__inner {
+  animation: card-shake 0.4s ease 0.25s;
+}
+
+@keyframes card-shake {
+  0%, 100% { transform: rotateY(180deg) translateX(0); }
+  25% { transform: rotateY(180deg) translateX(-5px); }
+  50% { transform: rotateY(180deg) translateX(5px); }
+  75% { transform: rotateY(180deg) translateX(-3px); }
 }
 
 /* Bell game */
@@ -1057,13 +1122,14 @@
 }
 
 /* ---------- Reading-text settings (size + weight via CSS vars) ----------
-   Defaults make body copy noticeably heavier than bare Courier regular:
-   --body-stroke thickens glyphs to an in-between weight (the monospace
-   stack has no real 500 face). The Settings panel overrides these vars. */
+   Body copy uses --font-body (modern system monospace with real weights);
+   the default is a true 500 medium plus a hairline stroke that quietly
+   thickens stacks lacking a 500 face (Menlo, Courier fallback). The
+   Settings panel overrides these vars. */
 .app {
   --text-scale: 1;
-  --body-weight: 400;
-  --body-stroke: 0.45px;
+  --body-weight: 500;
+  --body-stroke: 0.25px;
 }
 
 .dialogue__speech,
@@ -1085,19 +1151,23 @@
 .jung-card__line,
 .dialogue__sub,
 .settings-panel__preview {
-  font-weight: var(--body-weight, 400);
-  -webkit-text-stroke: var(--body-stroke, 0.45px) currentColor;
+  font-family: var(--font-body);
+  font-weight: var(--body-weight, 500);
+  -webkit-text-stroke: var(--body-stroke, 0.25px) currentColor;
+  line-height: 1.6;
 }
 
+/* Sizes follow web body-copy standards: primary reading text ≥16px. */
 .dialogue__speech,
 .lecture-panel__body {
-  font-size: calc(15px * var(--text-scale, 1));
+  font-size: calc(17px * var(--text-scale, 1));
+  line-height: 1.65;
 }
 
 .kahneman-q,
 .lecture-list__item,
 .locked-modal__body {
-  font-size: calc(14px * var(--text-scale, 1));
+  font-size: calc(16px * var(--text-scale, 1));
 }
 
 .mg__hint,
@@ -1109,13 +1179,27 @@
 .journal__lecture,
 .journal__folk-line,
 .loftus-photo__facts {
-  font-size: calc(13px * var(--text-scale, 1));
+  font-size: calc(15px * var(--text-scale, 1));
 }
 
 .watson-ethics,
 .journal__folk-contrib,
 .dialogue__sub {
-  font-size: calc(12px * var(--text-scale, 1));
+  font-size: calc(14px * var(--text-scale, 1));
+}
+
+.jung-card__line {
+  font-size: calc(13px * var(--text-scale, 1));
+}
+
+/* Long-text answer buttons read as body copy, not shouting chrome. */
+.kahneman-options .pixel-btn,
+.maslow-pool .pixel-btn {
+  font-family: var(--font-body);
+  font-size: calc(15px * var(--text-scale, 1));
+  text-transform: none;
+  letter-spacing: 0;
+  line-height: 1.45;
 }
 
 /* ---------- Settings panel ---------- */
@@ -1172,11 +1256,14 @@
   .interact-prompt,
   .watson-animal--calm,
   .maslow-cake--topple,
+  .memory-card--done .memory-card__face--front,
+  .memory-card--miss .memory-card__inner,
   .caret {
     animation: none;
   }
 
-  .pixel-btn {
+  .pixel-btn,
+  .memory-card__inner {
     transition: none;
   }
 }

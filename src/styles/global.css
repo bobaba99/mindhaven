@@ -13,6 +13,11 @@
   --gold: #e0b84b;
   --locked: #8a8175;
   --font-pixel: 'Courier New', 'Lucida Console', monospace;
+  /* Body copy: modern system monospace — real weights and far better glyph
+     shapes than Courier New. Keeps the typewriter character, reads like 2026. */
+  --font-body:
+    ui-monospace, 'SF Mono', 'Cascadia Mono', Consolas, Menlo, 'Liberation Mono',
+    'Courier New', monospace;
 }
 
 * {

@@ -48,13 +48,14 @@ describe('cssVarsFor', () => {
     expect(cssVarsFor({ textSize: 'large', textWeight: 'regular' })['--text-scale']).toBe('1.2')
   })
 
-  it('maps weights to font-weight + stroke pairs (medium = stroke-thickened)', () => {
+  it('maps weights to true font weights (medium = 500 with a hairline assist)', () => {
     const regular = cssVarsFor({ textSize: 'medium', textWeight: 'regular' })
     expect(regular['--body-weight']).toBe('400')
     expect(regular['--body-stroke']).toBe('0px')
     const medium = cssVarsFor({ textSize: 'medium', textWeight: 'medium' })
-    expect(medium['--body-weight']).toBe('400')
+    expect(medium['--body-weight']).toBe('500')
     expect(parseFloat(medium['--body-stroke'])).toBeGreaterThan(0)
+    expect(parseFloat(medium['--body-stroke'])).toBeLessThan(0.45)
     const bold = cssVarsFor({ textSize: 'medium', textWeight: 'bold' })
     expect(bold['--body-weight']).toBe('700')
     expect(bold['--body-stroke']).toBe('0px')

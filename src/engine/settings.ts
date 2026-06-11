@@ -2,9 +2,9 @@
  * Player-adjustable reading settings (text size + weight), persisted to
  * localStorage and applied as CSS custom properties on the app root.
  *
- * Weight note: the game's monospace stack (Courier New) only ships regular
- * and bold faces, so the "medium" step is synthesized with a hairline text
- * stroke — a true in-between thickness without shipping a webfont.
+ * Weight note: body copy uses a modern system-monospace stack (--font-body);
+ * "medium" asks for a real 500 face and adds a hairline stroke so stacks
+ * without one (Menlo, Courier fallback) still thicken — no webfont shipped.
  */
 export type TextSize = 'small' | 'medium' | 'large'
 export type TextWeight = 'regular' | 'medium' | 'bold'
@@ -64,7 +64,9 @@ const SCALE_BY_SIZE: Record<TextSize, string> = {
 
 const WEIGHT_BY_KIND: Record<TextWeight, { weight: string; stroke: string }> = {
   regular: { weight: '400', stroke: '0px' },
-  medium: { weight: '400', stroke: '0.45px' },
+  // True 500 where the stack has it (SF Mono, Consolas variants); the hairline
+  // stroke quietly covers faces that lack a medium (Menlo, Courier fallback).
+  medium: { weight: '500', stroke: '0.25px' },
   bold: { weight: '700', stroke: '0px' },
 }
 

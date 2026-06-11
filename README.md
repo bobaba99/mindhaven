@@ -102,6 +102,10 @@ added:
 - **Mobile**: on-screen D-pad + interact button (coarse-pointer only) driving
   the same input controller as the keyboard, with pointer capture so releases
   always land; responsive overlay fixes down to 320 px.
+- **Readability**: body copy uses a modern system-monospace stack (SF Mono /
+  Cascadia / Consolas) at 16–17 px, weight 500, line-height 1.6+, with an
+  in-game setting for text size and weight; building signs render at device
+  resolution; prefers-reduced-motion is honored throughout.
 - **Audio**: zero-asset WebAudio SFX, failure-safe on browsers without
   AudioContext, mute persisted.
 - **Crash recovery**: an error boundary with a reset-save escape hatch.
