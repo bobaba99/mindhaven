@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { BUILDINGS } from './data/buildings'
 import type { Building, MiniLecture } from './data/types'
 import { isUnlocked, canAfford } from './engine/progress'
+import { isMuted, playSfx, setMuted } from './engine/audio'
 import { useProgress } from './hooks/useProgress'
 import { TownCanvas } from './components/TownCanvas'
 import { HUD } from './components/HUD'
@@ -25,6 +26,7 @@ type Overlay =
 export function App() {
   const [started, setStarted] = useState(false)
   const [overlay, setOverlay] = useState<Overlay>({ kind: 'none' })
+  const [muted, setMutedState] = useState(() => isMuted())
   const { progress, readIntro, completeLecture, unlock, addInsight } = useProgress()
 
   // Track which buildings have already paid out their one-time hook Insight.
@@ -34,13 +36,24 @@ export function App() {
 
   const unlockedIds = progress.unlockedBuildings
 
+  const toggleMute = useCallback(() => {
+    setMutedState((m) => {
+      const next = !m
+      setMuted(next)
+      if (!next) playSfx('blip')
+      return next
+    })
+  }, [])
+
   const handleInteract = useCallback(
     (buildingId: string) => {
       const building = BUILDING_BY_ID.get(buildingId)
       if (!building) return
       if (isUnlocked(progress, buildingId)) {
+        playSfx('blip')
         setOverlay({ kind: 'dialogue', building })
       } else {
+        playSfx('locked')
         setOverlay({ kind: 'locked', building })
       }
     },
@@ -52,8 +65,21 @@ export function App() {
       if (hookPaid.current.has(buildingId)) return
       hookPaid.current.add(buildingId)
       addInsight(INSIGHT_PER_HOOK)
+      playSfx('chime')
     },
     [addInsight],
+  )
+
+  // Ref mirror so the callback stays stable and closure-proof while still
+  // only chiming for genuinely new lectures.
+  const completedRef = useRef(progress.completedLectures)
+  completedRef.current = progress.completedLectures
+  const handleLectureComplete = useCallback(
+    (lectureId: string) => {
+      if (!completedRef.current.includes(lectureId)) playSfx('insight')
+      completeLecture(lectureId)
+    },
+    [completeLecture],
   )
 
   // Global J = journal (only when no blocking overlay is mid-flow).
@@ -80,6 +106,8 @@ export function App() {
         lecturesDone={lecturesDone}
         buildingsUnlocked={unlockedIds.length}
         totalBuildings={BUILDINGS.length}
+        muted={muted}
+        onToggleMute={toggleMute}
         onOpenJournal={() => setOverlay({ kind: 'journal' })}
       />
 
@@ -103,7 +131,7 @@ export function App() {
           building={overlay.building}
           completedLectures={progress.completedLectures}
           onIntroRead={readIntro}
-          onLectureComplete={completeLecture}
+          onLectureComplete={handleLectureComplete}
           onHookComplete={handleHookComplete}
           onClose={closeOverlay}
         />
@@ -116,6 +144,7 @@ export function App() {
           canAfford={canAfford(progress, overlay.building.id)}
           onUnlock={() => {
             unlock(overlay.building.id)
+            playSfx('unlock')
             setOverlay({ kind: 'dialogue', building: overlay.building })
           }}
           onClose={closeOverlay}

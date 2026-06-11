@@ -5,15 +5,19 @@ interface HUDProps {
   lecturesDone: number
   buildingsUnlocked: number
   totalBuildings: number
+  muted: boolean
+  onToggleMute: () => void
   onOpenJournal: () => void
 }
 
-/** Top bar: title, Insight currency, progress, and the Journal button. */
+/** Top bar: title, Insight currency, progress, sound toggle, Journal button. */
 export function HUD({
   insight,
   lecturesDone,
   buildingsUnlocked,
   totalBuildings,
+  muted,
+  onToggleMute,
   onOpenJournal,
 }: HUDProps) {
   return (
@@ -32,6 +36,15 @@ export function HUD({
         <span className="hud__chip">
           📖 {lecturesDone}/{TOTAL_LECTURES}
         </span>
+        <button
+          className="pixel-btn hud__journal"
+          onClick={onToggleMute}
+          aria-label={muted ? 'Unmute sound effects' : 'Mute sound effects'}
+          aria-pressed={muted}
+          title={muted ? 'Sound: off' : 'Sound: on'}
+        >
+          {muted ? '🔇' : '🔊'}
+        </button>
         <button className="pixel-btn hud__journal" onClick={onOpenJournal}>
           Journal (J)
         </button>
