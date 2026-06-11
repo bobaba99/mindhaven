@@ -69,4 +69,16 @@ describe('useTypewriter', () => {
     expect(result.current.done).toBe(true)
     expect(result.current.shown).toBe(TEXT)
   })
+
+  it('shows the full text immediately when the user prefers reduced motion', () => {
+    vi.stubGlobal('matchMedia', (query: string) => ({
+      matches: query.includes('prefers-reduced-motion'),
+      media: query,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    }))
+    const { result } = renderHook(() => useTypewriter(TEXT, 50))
+    expect(result.current.done).toBe(true)
+    expect(result.current.shown).toBe(TEXT)
+  })
 })

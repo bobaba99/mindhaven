@@ -7,6 +7,7 @@ interface HUDProps {
   totalBuildings: number
   muted: boolean
   onToggleMute: () => void
+  onOpenSettings: () => void
   onOpenJournal: () => void
 }
 
@@ -18,6 +19,7 @@ export function HUD({
   totalBuildings,
   muted,
   onToggleMute,
+  onOpenSettings,
   onOpenJournal,
 }: HUDProps) {
   return (
@@ -44,6 +46,14 @@ export function HUD({
           title={muted ? 'Sound: off' : 'Sound: on'}
         >
           {muted ? '🔇' : '🔊'}
+        </button>
+        <button
+          className="pixel-btn hud__journal"
+          onClick={onOpenSettings}
+          aria-label="Open reading settings"
+          title="Text size & weight"
+        >
+          ⚙
         </button>
         <button className="pixel-btn hud__journal" onClick={onOpenJournal}>
           Journal (J)

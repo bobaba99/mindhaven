@@ -1056,6 +1056,131 @@
   color: #3a2410;
 }
 
+/* ---------- Reading-text settings (size + weight via CSS vars) ----------
+   Defaults make body copy noticeably heavier than bare Courier regular:
+   --body-stroke thickens glyphs to an in-between weight (the monospace
+   stack has no real 500 face). The Settings panel overrides these vars. */
+.app {
+  --text-scale: 1;
+  --body-weight: 400;
+  --body-stroke: 0.45px;
+}
+
+.dialogue__speech,
+.lecture-panel__body,
+.mg__hint,
+.mg__stat,
+.mg__log,
+.kahneman-q,
+.kahneman-explain,
+.hook-stub-note,
+.watson-ethics,
+.locked-modal__body,
+.title-screen__blurb,
+.journal__folk-line,
+.journal__folk-contrib,
+.journal__lecture,
+.lecture-list__item,
+.loftus-photo__facts,
+.jung-card__line,
+.dialogue__sub,
+.settings-panel__preview {
+  font-weight: var(--body-weight, 400);
+  -webkit-text-stroke: var(--body-stroke, 0.45px) currentColor;
+}
+
+.dialogue__speech,
+.lecture-panel__body {
+  font-size: calc(15px * var(--text-scale, 1));
+}
+
+.kahneman-q,
+.lecture-list__item,
+.locked-modal__body {
+  font-size: calc(14px * var(--text-scale, 1));
+}
+
+.mg__hint,
+.mg__stat,
+.mg__log,
+.kahneman-explain,
+.hook-stub-note,
+.title-screen__blurb,
+.journal__lecture,
+.journal__folk-line,
+.loftus-photo__facts {
+  font-size: calc(13px * var(--text-scale, 1));
+}
+
+.watson-ethics,
+.journal__folk-contrib,
+.dialogue__sub {
+  font-size: calc(12px * var(--text-scale, 1));
+}
+
+/* ---------- Settings panel ---------- */
+.settings-panel {
+  width: min(460px, 94vw);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.settings-panel h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #3a2410;
+}
+
+.settings-panel__group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.settings-panel__label {
+  font-size: 12px;
+  font-weight: bold;
+  color: #5a4326;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.settings-panel__options {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.settings-panel__preview {
+  margin: 0;
+  background: var(--parchment);
+  border: 2px dashed #b89a5e;
+  padding: 10px 12px;
+  line-height: 1.6;
+  color: #2e2218;
+}
+
+.settings-panel__foot {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .interact-prompt,
+  .watson-animal--calm,
+  .maslow-cake--topple,
+  .caret {
+    animation: none;
+  }
+
+  .pixel-btn {
+    transition: none;
+  }
+}
+
 /* ---------- Crash card (error boundary) ---------- */
 .crash-card {
   width: min(480px, 94vw);

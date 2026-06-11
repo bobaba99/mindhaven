@@ -3,6 +3,12 @@ import { BUILDINGS } from './data/buildings'
 import type { Building, MiniLecture } from './data/types'
 import { isUnlocked, canAfford } from './engine/progress'
 import { isMuted, playSfx, setMuted } from './engine/audio'
+import {
+  cssVarsFor,
+  loadSettings,
+  saveSettings,
+  type GameSettings,
+} from './engine/settings'
 import { useProgress } from './hooks/useProgress'
 import { TownCanvas } from './components/TownCanvas'
 import { HUD } from './components/HUD'
@@ -10,6 +16,7 @@ import { DialoguePanel } from './components/DialoguePanel'
 import { LockedModal } from './components/LockedModal'
 import { Journal } from './components/Journal'
 import { LectureRevisit } from './components/LectureRevisit'
+import { SettingsPanel } from './components/SettingsPanel'
 import { TitleScreen } from './components/TitleScreen'
 import './styles/ui.css'
 
@@ -22,11 +29,13 @@ type Overlay =
   | { kind: 'locked'; building: Building }
   | { kind: 'journal' }
   | { kind: 'revisit'; lecture: MiniLecture }
+  | { kind: 'settings' }
 
 export function App() {
   const [started, setStarted] = useState(false)
   const [overlay, setOverlay] = useState<Overlay>({ kind: 'none' })
   const [muted, setMutedState] = useState(() => isMuted())
+  const [settings, setSettings] = useState<GameSettings>(() => loadSettings())
   const { progress, readIntro, completeLecture, unlock, addInsight } = useProgress()
 
   // Track which buildings have already paid out their one-time hook Insight.
@@ -43,6 +52,11 @@ export function App() {
       if (!next) playSfx('blip')
       return next
     })
+  }, [])
+
+  const updateSettings = useCallback((next: GameSettings) => {
+    setSettings(next)
+    saveSettings(next)
   }, [])
 
   const handleInteract = useCallback(
@@ -100,7 +114,7 @@ export function App() {
   const lecturesDone = progress.completedLectures.length
 
   return (
-    <div className="app">
+    <div className="app" style={cssVarsFor(settings) as React.CSSProperties}>
       <HUD
         insight={progress.insight}
         lecturesDone={lecturesDone}
@@ -108,6 +122,7 @@ export function App() {
         totalBuildings={BUILDINGS.length}
         muted={muted}
         onToggleMute={toggleMute}
+        onOpenSettings={() => setOverlay({ kind: 'settings' })}
         onOpenJournal={() => setOverlay({ kind: 'journal' })}
       />
 
@@ -164,6 +179,14 @@ export function App() {
         <LectureRevisit
           lecture={overlay.lecture}
           onClose={() => setOverlay({ kind: 'journal' })}
+        />
+      )}
+
+      {overlay.kind === 'settings' && (
+        <SettingsPanel
+          settings={settings}
+          onChange={updateSettings}
+          onClose={closeOverlay}
         />
       )}
     </div>
