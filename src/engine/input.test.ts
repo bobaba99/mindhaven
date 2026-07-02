@@ -40,6 +40,20 @@ describe('createInput programmatic controls (touch)', () => {
     expect(input.state.right).toBe(false)
   })
 
+  it('releaseAll clears every held direction (overlay-open safety)', () => {
+    let enabled = true
+    const onInteract = vi.fn()
+    const input = createInput({ onInteract, isEnabled: () => enabled })
+    disposers.push(input.dispose)
+    input.press('left')
+    input.press('up')
+    // an overlay opens mid-hold: the touch buttons unmount and their
+    // pointerup may never fire — releaseAll is the recovery path
+    enabled = false
+    input.releaseAll()
+    expect(input.state).toEqual({ up: false, down: false, left: false, right: false })
+  })
+
   it('interact fires the callback only while enabled', () => {
     let enabled = true
     const onInteract = vi.fn()

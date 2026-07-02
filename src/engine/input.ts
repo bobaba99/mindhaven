@@ -30,6 +30,12 @@ export interface InputController {
   press: (key: MoveKey) => void
   /** Programmatic release. Always lands, so touch keys can never stick. */
   release: (key: MoveKey) => void
+  /**
+   * Clear every held direction. Called when an overlay pauses the game: the
+   * touch D-pad unmounts mid-gesture and its pointerup may never fire, which
+   * would otherwise leave the player auto-walking after the overlay closes.
+   */
+  releaseAll: () => void
   /** Programmatic interact (touch button). Respects the enabled gate. */
   interact: () => void
   dispose: () => void
@@ -53,6 +59,10 @@ export function createInput(opts: {
 
   const release = (key: MoveKey) => {
     state[key] = false
+  }
+
+  const releaseAll = () => {
+    state.up = state.down = state.left = state.right = false
   }
 
   const interact = () => {
@@ -95,6 +105,7 @@ export function createInput(opts: {
     state,
     press,
     release,
+    releaseAll,
     interact,
     dispose: () => {
       window.removeEventListener('keydown', handleDown)
