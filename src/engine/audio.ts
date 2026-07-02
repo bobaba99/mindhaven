@@ -15,6 +15,7 @@ export type SfxName =
   | 'tick'
 
 export const MUTE_STORAGE_KEY = 'mindhaven.muted.v1'
+export const VOLUME_STORAGE_KEY = 'mindhaven.volume.v1'
 
 export function isMuted(): boolean {
   try {
@@ -32,12 +33,45 @@ export function setMuted(muted: boolean): void {
   }
 }
 
+function clamp01(v: number): number {
+  return v < 0 ? 0 : v > 1 ? 1 : v
+}
+
+/** Master volume in [0, 1], applied to SFX and music alike. Defaults to 1. */
+export function getVolume(): number {
+  try {
+    const raw = localStorage.getItem(VOLUME_STORAGE_KEY)
+    if (raw === null) return 1
+    const v = Number(raw)
+    return Number.isFinite(v) ? clamp01(v) : 1
+  } catch {
+    return 1
+  }
+}
+
+export function setVolume(volume: number): void {
+  const v = Number.isFinite(volume) ? clamp01(volume) : 1
+  try {
+    localStorage.setItem(VOLUME_STORAGE_KEY, String(v))
+  } catch {
+    // storage unavailable — volume just won't persist
+  }
+}
+
 type AudioContextCtor = new () => AudioContext
 
 let sharedCtx: AudioContext | null = null
 
+/**
+ * The shared context if one already exists — never creates or resumes it.
+ * For teardown paths (fades, stops) that must not wake a suspended context.
+ */
+export function peekAudioContext(): AudioContext | null {
+  return sharedCtx
+}
+
 /** Lazily create (and resume) the context — must follow a user gesture. */
-function getCtx(): AudioContext | null {
+export function getAudioContext(): AudioContext | null {
   try {
     if (!sharedCtx) {
       const w = window as Window & { webkitAudioContext?: AudioContextCtor }
@@ -54,7 +88,7 @@ function getCtx(): AudioContext | null {
   }
 }
 
-interface Note {
+export interface Note {
   freq: number
   /** Seconds after "now" the note starts. */
   at: number
@@ -63,20 +97,35 @@ interface Note {
   vol: number
 }
 
-function playNotes(ctx: AudioContext, notes: Note[]): void {
-  const now = ctx.currentTime
+/**
+ * Schedule notes at an absolute context time onto a destination node.
+ * Shared by fire-and-forget SFX and the music engine's bar scheduler.
+ */
+export function scheduleNotes(
+  ctx: AudioContext,
+  destination: AudioNode,
+  notes: Note[],
+  startAt: number,
+  volumeScale = 1,
+): void {
   for (const n of notes) {
+    const vol = n.vol * volumeScale
+    if (vol <= 0) continue
     const osc = ctx.createOscillator()
     const gain = ctx.createGain()
     osc.type = n.type
     osc.frequency.value = n.freq
-    gain.gain.setValueAtTime(n.vol, now + n.at)
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + n.at + n.dur)
+    gain.gain.setValueAtTime(vol, startAt + n.at)
+    gain.gain.exponentialRampToValueAtTime(0.0001, startAt + n.at + n.dur)
     osc.connect(gain)
-    gain.connect(ctx.destination)
-    osc.start(now + n.at)
-    osc.stop(now + n.at + n.dur + 0.02)
+    gain.connect(destination)
+    osc.start(startAt + n.at)
+    osc.stop(startAt + n.at + n.dur + 0.02)
   }
+}
+
+function playNotes(ctx: AudioContext, notes: Note[]): void {
+  scheduleNotes(ctx, ctx.destination, notes, ctx.currentTime, getVolume())
 }
 
 const RECIPES: Record<SfxName, Note[]> = {
@@ -122,7 +171,7 @@ const RECIPES: Record<SfxName, Note[]> = {
 /** Fire-and-forget a named sound effect. Silent when muted or unsupported. */
 export function playSfx(name: SfxName): void {
   if (isMuted()) return
-  const ctx = getCtx()
+  const ctx = getAudioContext()
   if (!ctx) return
   try {
     playNotes(ctx, RECIPES[name])

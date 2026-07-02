@@ -15,6 +15,7 @@ import {
   type WandererState,
 } from '../engine/townsfolk'
 import { nearestBuildingId } from '../engine/proximity'
+import { setMusicDrift } from '../engine/music'
 import { renderStaticWorld } from '../engine/renderTown'
 import { drawSignOverlay } from '../engine/signOverlay'
 import { drawPlayer, drawTownsperson } from '../art/drawSprites'
@@ -53,6 +54,13 @@ export function useGameLoop({
 
   // keep mutable refs in sync with props without restarting the loop
   pausedRef.current = paused
+
+  // When an overlay pauses the game the touch D-pad unmounts mid-gesture and
+  // its pointerup may never fire — clear held directions so the player can't
+  // resume auto-walking a direction nobody is pressing.
+  useEffect(() => {
+    if (paused) inputRef.current?.releaseAll()
+  }, [paused])
 
   const onInteractRef = useRef(onInteract)
   const onNearChangeRef = useRef(onNearChange)
@@ -101,6 +109,9 @@ export function useGameLoop({
       if (!pausedRef.current) {
         playerRef.current = stepPlayer(playerRef.current, input.state, dt)
         folkRef.current = stepTownsfolk(folkRef.current, dt)
+
+        // the town theme drifts with the player's place on the century street
+        setMusicDrift(playerRef.current.x / (WORLD_W - PLAYER_W))
 
         const near = nearestBuildingId(playerRef.current)
         if (near !== nearRef.current) {

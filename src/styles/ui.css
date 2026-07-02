@@ -1246,6 +1246,34 @@
   color: #2e2218;
 }
 
+.settings-panel__options--slider {
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.settings-panel__slider {
+  flex: 1;
+  accent-color: #7a5a2e;
+  height: 22px;
+  cursor: pointer;
+}
+
+.settings-panel__slider-value {
+  min-width: 44px;
+  text-align: right;
+  font-size: 13px;
+  font-weight: bold;
+  color: #3a2410;
+  font-variant-numeric: tabular-nums;
+}
+
+.settings-panel__hint {
+  margin: 0;
+  font-size: 12px;
+  color: #6b543a;
+  line-height: 1.5;
+}
+
 .settings-panel__foot {
   display: flex;
   justify-content: flex-end;

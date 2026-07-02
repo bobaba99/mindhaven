@@ -47,7 +47,7 @@ export function HUD({
         <button
           className="pixel-btn hud__journal"
           onClick={onToggleMute}
-          aria-label={muted ? 'Unmute sound effects' : 'Mute sound effects'}
+          aria-label={muted ? 'Unmute music and sound' : 'Mute music and sound'}
           aria-pressed={muted}
           title={muted ? 'Sound: off' : 'Sound: on'}
         >
@@ -56,8 +56,8 @@ export function HUD({
         <button
           className="pixel-btn hud__journal"
           onClick={onOpenSettings}
-          aria-label="Open reading settings"
-          title="Text size & weight"
+          aria-label="Open settings"
+          title="Volume, text size & weight"
         >
           ⚙
         </button>

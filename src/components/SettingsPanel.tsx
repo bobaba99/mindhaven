@@ -4,7 +4,10 @@ import type { GameSettings, TextSize, TextWeight } from '../engine/settings'
 
 interface SettingsPanelProps {
   settings: GameSettings
+  /** Master audio volume, 0..1 (music and effects alike). */
+  volume: number
   onChange: (settings: GameSettings) => void
+  onVolumeChange: (volume: number) => void
   onClose: () => void
 }
 
@@ -20,15 +23,44 @@ const WEIGHTS: Array<{ id: TextWeight; label: string }> = [
   { id: 'bold', label: 'Bold' },
 ]
 
-/** Reading settings: text size + weight, with a live preview line. */
-export function SettingsPanel({ settings, onChange, onClose }: SettingsPanelProps) {
+/** Reading + sound settings, with a live preview line. */
+export function SettingsPanel({
+  settings,
+  volume,
+  onChange,
+  onVolumeChange,
+  onClose,
+}: SettingsPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null)
   useModalKeys(panelRef, onClose)
 
   return (
-    <div className="overlay" role="dialog" aria-modal="true" aria-label="Reading settings">
+    <div className="overlay" role="dialog" aria-modal="true" aria-label="Game settings">
       <div className="pixel-panel settings-panel" ref={panelRef}>
         <h2>Settings</h2>
+
+        <div className="settings-panel__group" role="group" aria-label="Sound volume">
+          <span className="settings-panel__label">Volume</span>
+          <div className="settings-panel__options settings-panel__options--slider">
+            <input
+              type="range"
+              className="settings-panel__slider"
+              min={0}
+              max={100}
+              step={5}
+              value={Math.round(volume * 100)}
+              aria-label="Music and effects volume"
+              aria-valuetext={`${Math.round(volume * 100)} percent`}
+              onChange={(e) => onVolumeChange(Number(e.target.value) / 100)}
+            />
+            <span className="settings-panel__slider-value" aria-hidden="true">
+              {Math.round(volume * 100)}%
+            </span>
+          </div>
+          <p className="settings-panel__hint">
+            Music and effects together — 🔊 in the top bar mutes everything.
+          </p>
+        </div>
 
         <div className="settings-panel__group" role="group" aria-label="Text size">
           <span className="settings-panel__label">Text size</span>

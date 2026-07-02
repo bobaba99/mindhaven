@@ -2,7 +2,19 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { BUILDINGS } from './data/buildings'
 import type { Building, MiniLecture } from './data/types'
 import { isUnlocked, canAfford } from './engine/progress'
-import { isMuted, playSfx, setMuted } from './engine/audio'
+import {
+  getVolume,
+  isMuted,
+  playSfx,
+  setMuted,
+  setVolume,
+} from './engine/audio'
+import {
+  playStinger,
+  startMusic,
+  stopMusic,
+  syncMusicVolume,
+} from './engine/music'
 import {
   cssVarsFor,
   loadSettings,
@@ -46,6 +58,7 @@ export function App() {
   const [started, setStarted] = useState(false)
   const [overlay, setOverlay] = useState<Overlay>({ kind: 'none' })
   const [muted, setMutedState] = useState(() => isMuted())
+  const [volume, setVolumeState] = useState(() => getVolume())
   const [settings, setSettings] = useState<GameSettings>(() => loadSettings())
   const [tour, setTour] = useState<TourState>(() =>
     isTourDone() ? { step: 'done', completed: true } : initialTour(),
@@ -72,6 +85,32 @@ export function App() {
     setSettings(next)
     saveSettings(next)
   }, [])
+
+  const updateVolume = useCallback((v: number) => {
+    setVolumeState(v)
+    setVolume(v)
+    syncMusicVolume()
+  }, [])
+
+  // The town theme runs while the game is on screen and unmuted. Starting on
+  // the Start click satisfies the browsers' user-gesture autoplay rule. The
+  // theme also yields when the tab is hidden — a backgrounded town shouldn't
+  // keep humming into someone's meeting.
+  useEffect(() => {
+    const sync = () => {
+      if (started && !muted && document.visibilityState === 'visible') {
+        startMusic()
+      } else {
+        stopMusic()
+      }
+    }
+    sync()
+    document.addEventListener('visibilitychange', sync)
+    return () => {
+      document.removeEventListener('visibilitychange', sync)
+      stopMusic()
+    }
+  }, [started, muted])
 
   // --- first-run tour ---
   const tourEvent = useCallback((event: TourEvent) => {
@@ -129,6 +168,7 @@ export function App() {
       if (!building) return
       if (isUnlocked(progress, buildingId)) {
         playSfx('blip')
+        playStinger(buildingId)
         setOverlay({ kind: 'dialogue', building })
         tourEvent('opened')
       } else {
@@ -257,7 +297,9 @@ export function App() {
       {overlay.kind === 'settings' && (
         <SettingsPanel
           settings={settings}
+          volume={volume}
           onChange={updateSettings}
+          onVolumeChange={updateVolume}
           onClose={closeOverlay}
         />
       )}
