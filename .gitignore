@@ -11,3 +11,4 @@ npm-debug.log*
 # TypeScript incremental build state
 *.tsbuildinfo
 .vercel
+.claude/

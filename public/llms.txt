@@ -5,7 +5,7 @@
 > where each of 14 shops is run by a famous psychologist (Wundt, Calkins,
 > Pavlov, Skinner, Watson, Freud, Jung, Maslow, Rogers, Piaget, Bandura,
 > Kahneman & Tversky, Loftus, Asch & Milgram). Each shop offers an
-> in-character greeting, 2–3 accurate mini-lectures, and an interactive
+> in-character greeting, 3 accurate mini-lectures, and an interactive
 > activity drawn from the figure's real theory. Progress is gated by an
 > "Insight" score and saved locally in the browser.
 

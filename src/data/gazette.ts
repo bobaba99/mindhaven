@@ -67,6 +67,45 @@ export const ISSUES: GazetteIssue[] = [
       },
     ],
   },
+  {
+    number: 2,
+    version: 'v1.2',
+    date: '2026-07-02',
+    headline: 'TOWN LEARNS TO HUM',
+    subhead:
+      'Composer revealed to be an oscillator; every shop gets its own tune, and a volume slider arrives for those who prefer their century quieter',
+    articles: [
+      {
+        title: 'A Soundtrack With No Instruments',
+        body:
+          'Wundt Way woke up humming this morning. The new town theme is played by no musician and stored in no file: the same code that draws the houses now composes the music, one bar at a time, out of raw WebAudio oscillators. Walk the street and listen to the century change — at the 1879 end the tune is sparse and clockwork, all ticks and squares, and by the modern end it has warmed into something denser and rounder. Nobody in town can whistle it back, because it never plays quite the same bar twice.',
+      },
+      {
+        title: 'Every Shop Hums Its Own Tune',
+        kicker: 'INTERIORS DESK',
+        body:
+          'Step inside any establishment and you will be greeted by a two-bar motif in the house style: the behaviorists tick like reinforcement schedules, the analysts drift in minor sines, and the humanists glow in warm triangles. Each motif is grown deterministically from the shop’s own name, so Freud’s couch will hum the same uneasy phrase forever, which the Gazette finds fitting.',
+      },
+      {
+        title: 'Issue Arrives Eight Days Late; Metronome Blamed',
+        kicker: 'CORRECTIONS & CLARIFICATIONS',
+        body:
+          'This edition was promised for June the 24th and is appearing on July the 2nd. The town’s composer — an oscillator, see front page — declined to apologize, noting that it does not experience time, only frequency. The mayor has docked its pay, which was nothing. The Gazette regrets the delay and reminds readers that the printing schedule remains: whenever it’s ready, ideally Wednesdays.',
+      },
+      {
+        title: 'Volume Slider Joins the Mute Button',
+        kicker: 'PUBLIC NOTICES',
+        body:
+          'Residents who found the town either too shy or too enthusiastic may now set its voice precisely: a volume slider has joined the reading settings under ⚙, governing music and effects together. The 🔊 button in the top bar still silences everything at a stroke. Saves, as ever, live in your browser and nowhere else.',
+      },
+      {
+        title: 'Pothole Report: Runaway Walker Apprehended',
+        kicker: 'STRESS-TEST DESK',
+        body:
+          'A review of the town’s machinery caught a genuine pothole: a traveler on a touch screen who held the walk button at the exact moment a door opened could find their legs still walking after the conversation ended, with no way to stop. The input ledger is now cleared whenever a door opens. One hundred forty-seven tests stand guard where one hundred twenty-six stood before; the other reviewers came back empty-handed, which the town takes as a compliment.',
+      },
+    ],
+  },
 ]
 
 export function latestIssue(): GazetteIssue {
