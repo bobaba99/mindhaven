@@ -1,5 +1,11 @@
 import { useEffect, useRef } from 'react'
-import { SCALE, WORLD_W, PLAYER_W } from '../engine/world'
+import {
+  SCALE,
+  PLAYER_W,
+  layoutFor,
+  spawnXFor,
+  type District,
+} from '../engine/world'
 import { createInput, type InputController, type MoveKey } from '../engine/input'
 import type { TouchControlsHandle } from '../components/TouchControls'
 import {
@@ -25,9 +31,13 @@ interface UseGameLoopArgs {
   canvasRef: React.RefObject<HTMLCanvasElement>
   /** Ids of currently-unlocked buildings (affects facade dimming). */
   unlockedIds: string[]
+  /** Which street the player is on. */
+  district: District
+  /** Whether the Memory Lane gate threshold has been reached. */
+  gateOpen: boolean
   /** True while an overlay is open — freezes movement + the loop's interact. */
   paused: boolean
-  /** Called when the player presses E/Enter near a door or a townsperson. */
+  /** Called when the player presses E/Enter near a door, wanderer, or gate. */
   onInteract: (target: Interactable) => void
   /** Reports the interactable currently in range (for the on-screen prompt). */
   onNearChange: (target: Interactable | null) => void
@@ -36,12 +46,15 @@ interface UseGameLoopArgs {
 /**
  * Drives the whole town: an rAF loop that steps the player + townsfolk, draws
  * the cached static world plus animated sprites, and runs a side-scrolling
- * camera that keeps the player roughly centered. Returns a stable handle the
- * touch controls can drive (it proxies to the live input controller).
+ * camera that keeps the player roughly centered. District changes respawn the
+ * player at the right entrance and swap the cached static world. Returns a
+ * stable handle the touch controls can drive.
  */
 export function useGameLoop({
   canvasRef,
   unlockedIds,
+  district,
+  gateOpen,
   paused,
   onInteract,
   onNearChange,
@@ -51,6 +64,7 @@ export function useGameLoop({
   const nearRef = useRef<Interactable | null>(null)
   const staticRef = useRef<HTMLCanvasElement | null>(null)
   const pausedRef = useRef(paused)
+  const districtRef = useRef<District>(district)
   const inputRef = useRef<InputController | null>(null)
 
   // keep mutable refs in sync with props without restarting the loop
@@ -68,14 +82,32 @@ export function useGameLoop({
   onInteractRef.current = onInteract
   onNearChangeRef.current = onNearChange
 
-  // (Re)build the cached static world whenever unlock state changes.
+  // Crossing a gate: respawn at the destination's entrance, clear the prompt,
+  // and (main street only) repopulate the wanderers.
+  const prevDistrictRef = useRef<District>(district)
+  useEffect(() => {
+    if (prevDistrictRef.current === district) return
+    const cameFrom = prevDistrictRef.current
+    prevDistrictRef.current = district
+    districtRef.current = district
+    playerRef.current = spawnPlayer(spawnXFor(district, cameFrom))
+    folkRef.current = district === 'main' ? spawnTownsfolk() : []
+    inputRef.current?.releaseAll()
+    nearRef.current = null
+    onNearChangeRef.current(null)
+  }, [district])
+
+  // (Re)build the cached static world whenever unlock/district/gate changes.
   // The draw loop reads staticRef each frame, so no re-render is needed.
   const unlockedSetRef = useRef<ReadonlySet<string>>(new Set(unlockedIds))
+  const gateOpenRef = useRef(gateOpen)
   useEffect(() => {
     const set = new Set(unlockedIds)
     unlockedSetRef.current = set
-    staticRef.current = renderStaticWorld(set)
-  }, [unlockedIds])
+    gateOpenRef.current = gateOpen
+    districtRef.current = district
+    staticRef.current = renderStaticWorld(set, district, gateOpen)
+  }, [unlockedIds, district, gateOpen])
 
   // input
   useEffect(() => {
@@ -108,14 +140,29 @@ export function useGameLoop({
       last = now
 
       if (!pausedRef.current) {
-        playerRef.current = stepPlayer(playerRef.current, input.state, dt)
+        const layout = layoutFor(districtRef.current)
+        playerRef.current = stepPlayer(
+          playerRef.current,
+          input.state,
+          dt,
+          layout.worldW,
+        )
         const { cx, cy } = playerCenter(playerRef.current)
         folkRef.current = stepTownsfolk(folkRef.current, dt, { x: cx, y: cy })
 
-        // the town theme drifts with the player's place on the century street
-        setMusicDrift(playerRef.current.x / (WORLD_W - PLAYER_W))
+        // The town theme drifts with the player's place on the century
+        // street. Memory Lane sits in the cognitive stretch of the timeline,
+        // so its short walk maps into the warmer 0.55–0.85 band.
+        const norm = playerRef.current.x / (layout.worldW - PLAYER_W)
+        setMusicDrift(
+          districtRef.current === 'main' ? norm : 0.55 + 0.3 * norm,
+        )
 
-        const near = nearestInteractable(playerRef.current, folkRef.current)
+        const near = nearestInteractable(
+          playerRef.current,
+          folkRef.current,
+          districtRef.current,
+        )
         const prev = nearRef.current
         if (near?.id !== prev?.id || near?.kind !== prev?.kind) {
           nearRef.current = near
@@ -140,11 +187,12 @@ export function useGameLoop({
       const dpr = canvas.width / cssW
       const drawScale = SCALE * dpr
       const viewW = canvas.width / drawScale
+      const worldW = layoutFor(districtRef.current).worldW
 
       // camera: center on player horizontally, clamped to world bounds. The
       // street is short, so the vertical camera is pinned to the top (camY = 0).
       const p = playerRef.current
-      const camX = clamp(p.x + PLAYER_W / 2 - viewW / 2, 0, Math.max(0, WORLD_W - viewW))
+      const camX = clamp(p.x + PLAYER_W / 2 - viewW / 2, 0, Math.max(0, worldW - viewW))
       const camY = 0
 
       ctx.imageSmoothingEnabled = false
@@ -172,6 +220,8 @@ export function useGameLoop({
         dpr,
         viewCssW: cssW,
         unlockedIds: unlockedSetRef.current,
+        district: districtRef.current,
+        gateOpen: gateOpenRef.current,
       })
     }
 

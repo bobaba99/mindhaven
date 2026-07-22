@@ -23,25 +23,20 @@ function px(ctx: Ctx, x: number, y: number, w: number, h: number, color: string)
   ctx.fillRect(x, y, w, h)
 }
 
-/** Sky gradient + a couple of soft clouds, drawn once into the static layer. */
-function drawSky(ctx: Ctx) {
+/** Sky gradient + soft clouds, drawn once into the static layer. */
+function drawSky(ctx: Ctx, cols: number) {
   const skyH = SKY_ROWS * TILE + 2 * TILE // extend a touch behind rooftops
   const grad = ctx.createLinearGradient(0, 0, 0, skyH)
   grad.addColorStop(0, COLORS.skyTop)
   grad.addColorStop(1, COLORS.skyLow)
   ctx.fillStyle = grad
-  ctx.fillRect(0, 0, WORLD_COLS * TILE, skyH)
+  ctx.fillRect(0, 0, cols * TILE, skyH)
 
-  const clouds: Array<[number, number, number]> = [
-    [6, 1, 3],
-    [22, 0.6, 4],
-    [40, 1.4, 3],
-    [58, 0.8, 4],
-    [78, 1.1, 3],
-  ]
-  for (const [cx, cy, w] of clouds) {
-    const bx = cx * TILE
-    const by = cy * TILE
+  // clouds every ~18 tiles, jittered by the deterministic hash
+  for (let c = 6; c < cols - 2; c += 18) {
+    const w = 3 + Math.floor(hash(c, 1) * 2)
+    const bx = c * TILE
+    const by = (0.6 + hash(c, 2)) * TILE
     for (let i = 0; i < w; i++) {
       const bump = i === 0 || i === w - 1 ? 3 : 0
       px(ctx, bx + i * 6, by + bump, 7, 6 - bump / 2, COLORS.cloud)
@@ -50,14 +45,14 @@ function drawSky(ctx: Ctx) {
 }
 
 /** Grass band with scattered blades; covers everything below the sky. */
-function drawGrass(ctx: Ctx) {
+function drawGrass(ctx: Ctx, cols: number) {
   const top = SKY_ROWS * TILE
   const h = (WORLD_ROWS - SKY_ROWS) * TILE
-  px(ctx, 0, top, WORLD_COLS * TILE, h, COLORS.grass)
+  px(ctx, 0, top, cols * TILE, h, COLORS.grass)
 
   // subtle checker shading
   for (let r = SKY_ROWS; r < WORLD_ROWS; r++) {
-    for (let c = 0; c < WORLD_COLS; c++) {
+    for (let c = 0; c < cols; c++) {
       if ((r + c) % 2 === 0) {
         px(ctx, c * TILE, r * TILE, TILE, TILE, COLORS.grassDark)
       }
@@ -65,7 +60,7 @@ function drawGrass(ctx: Ctx) {
   }
   // blades
   for (let r = SKY_ROWS; r < WORLD_ROWS; r++) {
-    for (let c = 0; c < WORLD_COLS; c++) {
+    for (let c = 0; c < cols; c++) {
       const h1 = hash(c, r)
       if (h1 > 0.86) {
         const gx = c * TILE + Math.floor(hash(c + 1, r) * (TILE - 3))
@@ -78,15 +73,15 @@ function drawGrass(ctx: Ctx) {
 }
 
 /** The walkable cobble path along the street band. */
-function drawPath(ctx: Ctx) {
+function drawPath(ctx: Ctx, cols: number) {
   const top = STREET_ROW * TILE
   const h = STREET_ROWS * TILE
-  const w = WORLD_COLS * TILE
+  const w = cols * TILE
   px(ctx, 0, top, w, h, COLORS.path)
 
   // cobble speckle
   for (let r = STREET_ROW; r < STREET_ROW + STREET_ROWS; r++) {
-    for (let c = 0; c < WORLD_COLS; c++) {
+    for (let c = 0; c < cols; c++) {
       const h1 = hash(c * 3, r * 5)
       if (h1 > 0.7) {
         px(ctx, c * TILE + 2, r * TILE + 3, 4, 3, COLORS.pathDark)
@@ -153,11 +148,53 @@ export function drawFence(ctx: Ctx, col: number, row: number) {
 }
 
 /** Draw the whole static backdrop (sky, grass, path) into a ctx. */
-export function drawBackdrop(ctx: Ctx) {
-  drawSky(ctx)
-  drawGrass(ctx)
-  drawPath(ctx)
+export function drawBackdrop(ctx: Ctx, cols: number = WORLD_COLS) {
+  drawSky(ctx, cols)
+  drawGrass(ctx, cols)
+  drawPath(ctx, cols)
   // a darker grass lip just under the buildings to ground them
   const lipY = (BUILDING_TOP_ROW + BUILDING_TILES_H) * TILE - 1
-  px(ctx, 0, lipY, WORLD_COLS * TILE, 2, COLORS.grassDark)
+  px(ctx, 0, lipY, cols * TILE, 2, COLORS.grassDark)
+}
+
+/**
+ * The Memory Lane gate: a hedge archway filling the gap between two facades,
+ * with a path running north under it. `open` lifts the wooden bar and lights
+ * the lanterns; locked shows a barred arch (the 90 ◆ plate is drawn by the
+ * crisp sign overlay, not here).
+ */
+export function drawGate(ctx: Ctx, col: number, widthTiles: number, open: boolean) {
+  const x = col * TILE
+  const w = widthTiles * TILE
+  const top = (BUILDING_TOP_ROW + 1) * TILE
+  const bottom = (BUILDING_TOP_ROW + BUILDING_TILES_H) * TILE
+
+  // the northward path glimpsed through the arch
+  px(ctx, x + 3, top, w - 6, bottom - top, open ? COLORS.path : COLORS.grassDark)
+  if (open) {
+    for (let r = top; r < bottom; r += 6) {
+      px(ctx, x + w / 2 - 2, r, 4, 3, COLORS.pathDark)
+    }
+  }
+
+  // hedge pillars
+  px(ctx, x, top - 6, 5, bottom - top + 6, COLORS.leafDark)
+  px(ctx, x + w - 5, top - 6, 5, bottom - top + 6, COLORS.leafDark)
+  px(ctx, x + 1, top - 5, 3, bottom - top + 4, COLORS.leaf)
+  px(ctx, x + w - 4, top - 5, 3, bottom - top + 4, COLORS.leaf)
+
+  // arch across the top
+  px(ctx, x, top - 10, w, 6, COLORS.leafDark)
+  px(ctx, x + 2, top - 9, w - 4, 3, COLORS.leaf)
+  px(ctx, x + w / 2 - 5, top - 13, 10, 4, COLORS.leafHi)
+
+  if (open) {
+    // lit lanterns on each pillar
+    px(ctx, x + 1, top + 2, 3, 4, COLORS.lampGlow)
+    px(ctx, x + w - 4, top + 2, 3, 4, COLORS.lampGlow)
+  } else {
+    // wooden bar across the opening
+    px(ctx, x + 2, top + 10, w - 4, 3, COLORS.fence)
+    px(ctx, x + 2, top + 18, w - 4, 3, COLORS.fenceDark)
+  }
 }

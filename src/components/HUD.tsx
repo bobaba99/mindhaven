@@ -5,6 +5,8 @@ interface HUDProps {
   lecturesDone: number
   buildingsUnlocked: number
   totalBuildings: number
+  /** Current street name shown next to the title. */
+  street: string
   muted: boolean
   onToggleMute: () => void
   onOpenSettings: () => void
@@ -18,6 +20,7 @@ export function HUD({
   lecturesDone,
   buildingsUnlocked,
   totalBuildings,
+  street,
   muted,
   onToggleMute,
   onOpenSettings,
@@ -28,7 +31,7 @@ export function HUD({
     <header className="hud">
       <div className="hud__brand">
         <span className="hud__title">Mindhaven</span>
-        <span className="hud__street">· Wundt Way</span>
+        <span className="hud__street">· {street}</span>
       </div>
       <div className="hud__stats">
         <span className="hud__insight" title="Insight currency">

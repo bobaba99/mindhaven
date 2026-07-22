@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { BUILDINGS, TOWNSFOLK } from './data/buildings'
+import { ALL_BUILDINGS, TOWNSFOLK } from './data/buildings'
 import type { Building, MiniLecture, Townsperson } from './data/types'
-import type { Interactable } from './engine/proximity'
+import { GATE_TO_LANE, type Interactable } from './engine/proximity'
+import { LANE_UNLOCK_COST, type District } from './engine/world'
 import { isUnlocked, canAfford } from './engine/progress'
 import {
   getVolume,
@@ -33,6 +34,7 @@ import {
 import { useProgress } from './hooks/useProgress'
 import { TownCanvas } from './components/TownCanvas'
 import { TownsfolkPanel } from './components/TownsfolkPanel'
+import { GateLockedModal } from './components/GateLockedModal'
 import { HUD } from './components/HUD'
 import { DialoguePanel } from './components/DialoguePanel'
 import { LockedModal } from './components/LockedModal'
@@ -44,7 +46,7 @@ import { TitleScreen } from './components/TitleScreen'
 import { TourToast } from './components/TourToast'
 import './styles/ui.css'
 
-const BUILDING_BY_ID = new Map(BUILDINGS.map((b) => [b.id, b]))
+const BUILDING_BY_ID = new Map(ALL_BUILDINGS.map((b) => [b.id, b]))
 const FOLK_BY_ID = new Map(TOWNSFOLK.map((t) => [t.id, t]))
 const INSIGHT_PER_HOOK = 4
 
@@ -53,6 +55,7 @@ type Overlay =
   | { kind: 'dialogue'; building: Building }
   | { kind: 'locked'; building: Building }
   | { kind: 'townsfolk'; person: Townsperson }
+  | { kind: 'gate-locked' }
   | { kind: 'journal' }
   | { kind: 'revisit'; lecture: MiniLecture }
   | { kind: 'settings' }
@@ -61,6 +64,7 @@ type Overlay =
 export function App() {
   const [started, setStarted] = useState(false)
   const [overlay, setOverlay] = useState<Overlay>({ kind: 'none' })
+  const [district, setDistrict] = useState<District>('main')
   const [muted, setMutedState] = useState(() => isMuted())
   const [volume, setVolumeState] = useState(() => getVolume())
   const [settings, setSettings] = useState<GameSettings>(() => loadSettings())
@@ -177,6 +181,21 @@ export function App() {
         setOverlay({ kind: 'townsfolk', person })
         return
       }
+      if (target.kind === 'gate') {
+        if (target.id === GATE_TO_LANE) {
+          if (progress.insight >= LANE_UNLOCK_COST) {
+            playSfx('unlock')
+            setDistrict('lane')
+          } else {
+            playSfx('locked')
+            setOverlay({ kind: 'gate-locked' })
+          }
+        } else {
+          playSfx('blip')
+          setDistrict('main')
+        }
+        return
+      }
       const building = BUILDING_BY_ID.get(target.id)
       if (!building) return
       if (isUnlocked(progress, target.id)) {
@@ -250,7 +269,8 @@ export function App() {
         insight={progress.insight}
         lecturesDone={lecturesDone}
         buildingsUnlocked={unlockedIds.length}
-        totalBuildings={BUILDINGS.length}
+        totalBuildings={ALL_BUILDINGS.length}
+        street={district === 'lane' ? 'Memory Lane' : 'Wundt Way'}
         muted={muted}
         onToggleMute={toggleMute}
         onOpenSettings={() => setOverlay({ kind: 'settings' })}
@@ -261,6 +281,8 @@ export function App() {
       <main className="app__stage">
         <TownCanvas
           unlockedIds={unlockedIds}
+          district={district}
+          gateOpen={progress.insight >= LANE_UNLOCK_COST}
           paused={paused}
           onInteract={handleInteract}
           onNearChange={handleNearChange}
@@ -298,6 +320,10 @@ export function App() {
           onQuestComplete={handleQuestComplete}
           onClose={closeOverlay}
         />
+      )}
+
+      {overlay.kind === 'gate-locked' && (
+        <GateLockedModal insight={progress.insight} onClose={closeOverlay} />
       )}
 
       {overlay.kind === 'locked' && (

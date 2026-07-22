@@ -1,16 +1,23 @@
 import { useEffect, useRef, useState } from 'react'
-import { SCALE, WORLD_H } from '../engine/world'
+import { SCALE, WORLD_H, layoutFor, type District } from '../engine/world'
 import { useGameLoop } from '../hooks/useGameLoop'
-import type { Interactable } from '../engine/proximity'
+import { GATE_TO_LANE, type Interactable } from '../engine/proximity'
 import { InteractPrompt } from './InteractPrompt'
 import { TouchControls } from './TouchControls'
-import { BUILDINGS, TOWNSFOLK } from '../data/buildings'
+import { ALL_BUILDINGS, TOWNSFOLK } from '../data/buildings'
 
-const BUILDING_NAME = new Map(BUILDINGS.map((b) => [b.id, b.name]))
+const BUILDING_NAME = new Map(ALL_BUILDINGS.map((b) => [b.id, b.name]))
 const FOLK_NAME = new Map(TOWNSFOLK.map((t) => [t.id, t.name]))
+const GATE_NAME: Record<string, string> = {
+  [GATE_TO_LANE]: 'Memory Lane',
+  'wundt-way': 'Wundt Way',
+}
 
 interface TownCanvasProps {
   unlockedIds: string[]
+  district: District
+  /** Whether the Memory Lane gate threshold has been reached. */
+  gateOpen: boolean
   paused: boolean
   onInteract: (target: Interactable) => void
   /** Optional observer for the interactable currently in range. */
@@ -23,6 +30,8 @@ interface TownCanvasProps {
  */
 export function TownCanvas({
   unlockedIds,
+  district,
+  gateOpen,
   paused,
   onInteract,
   onNearChange,
@@ -43,10 +52,13 @@ export function TownCanvas({
       const wrap = wrapRef.current
       if (!canvas || !wrap) return
       const dpr = Math.max(1, Math.floor(window.devicePixelRatio || 1))
-      const cssW = Math.floor(wrap.clientWidth)
-      // cap drawn height to the world so we never show empty space below
-      const worldPx = WORLD_H * SCALE
-      const cssH = Math.floor(Math.min(wrap.clientHeight, worldPx))
+      // cap drawn width/height to the district's world so we never show blank
+      // canvas past its edges — Memory Lane is narrower than a wide desktop
+      // viewport, and the wrap's flex centering letterboxes it like a stage.
+      const worldWPx = layoutFor(district).worldW * SCALE
+      const worldHPx = WORLD_H * SCALE
+      const cssW = Math.floor(Math.min(wrap.clientWidth, worldWPx))
+      const cssH = Math.floor(Math.min(wrap.clientHeight, worldHPx))
       canvas.width = cssW * dpr
       canvas.height = cssH * dpr
       canvas.style.width = `${cssW}px`
@@ -55,11 +67,13 @@ export function TownCanvas({
     resize()
     window.addEventListener('resize', resize)
     return () => window.removeEventListener('resize', resize)
-  }, [])
+  }, [district])
 
   const touch = useGameLoop({
     canvasRef,
     unlockedIds,
+    district,
+    gateOpen,
     paused,
     onInteract,
     onNearChange: (id) => {
@@ -76,9 +90,14 @@ export function TownCanvas({
           label={
             near.kind === 'townsperson'
               ? FOLK_NAME.get(near.id) ?? 'this wanderer'
-              : BUILDING_NAME.get(near.id) ?? 'this shop'
+              : near.kind === 'gate'
+                ? GATE_NAME[near.id] ?? 'the gate'
+                : BUILDING_NAME.get(near.id) ?? 'this shop'
           }
-          locked={near.kind === 'building' && !unlockedIds.includes(near.id)}
+          locked={
+            (near.kind === 'building' && !unlockedIds.includes(near.id)) ||
+            (near.kind === 'gate' && near.id === GATE_TO_LANE && !gateOpen)
+          }
           verb={near.kind === 'townsperson' ? 'talk' : 'enter'}
         />
       )}
