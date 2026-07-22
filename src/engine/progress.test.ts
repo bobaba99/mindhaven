@@ -1,14 +1,16 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { BUILDINGS } from '../data/buildings'
+import { BUILDINGS, TOWNSFOLK } from '../data/buildings'
 import {
   INSIGHT_PER_INTRO,
   INSIGHT_PER_LECTURE,
+  INSIGHT_PER_QUEST,
   TOTAL_LECTURES,
   defaultProgress,
   loadProgress,
   saveProgress,
   markVisited,
   markLectureComplete,
+  markQuestComplete,
   unlockBuilding,
   meetsUnlockThreshold,
   unlockCostFor,
@@ -26,6 +28,48 @@ describe('defaultProgress', () => {
     expect(p.insight).toBe(0)
     expect(p.completedLectures).toEqual([])
     expect(p.visitedBuildings).toEqual([])
+    expect(p.completedQuests).toEqual([])
+  })
+})
+
+describe('townsfolk quest completion (v1.3)', () => {
+  const folkId = TOWNSFOLK[0].id
+
+  it('markQuestComplete grants quest insight once and is idempotent', () => {
+    const a1 = markQuestComplete(defaultProgress(), folkId)
+    expect(a1.insight).toBe(INSIGHT_PER_QUEST)
+    expect(a1.completedQuests).toEqual([folkId])
+    expect(markQuestComplete(a1, folkId)).toBe(a1)
+  })
+
+  it('does not mutate the input state', () => {
+    const p = defaultProgress()
+    const frozen = JSON.stringify(p)
+    markQuestComplete(p, folkId)
+    expect(JSON.stringify(p)).toBe(frozen)
+  })
+
+  it('persists and reloads completed quests', () => {
+    localStorage.clear()
+    saveProgress(markQuestComplete(defaultProgress(), folkId))
+    expect(loadProgress().completedQuests).toEqual([folkId])
+  })
+
+  it('drops unknown quest ids injected into storage', () => {
+    localStorage.clear()
+    localStorage.setItem(
+      'mindhaven.progress.v1',
+      JSON.stringify({ completedQuests: ['ghost-wanderer', folkId] }),
+    )
+    expect(loadProgress().completedQuests).toEqual([folkId])
+  })
+
+  it('loads pre-v1.3 saves (no completedQuests field) as an empty list', () => {
+    localStorage.clear()
+    localStorage.setItem('mindhaven.progress.v1', JSON.stringify({ insight: 12 }))
+    const p = loadProgress()
+    expect(p.insight).toBe(12)
+    expect(p.completedQuests).toEqual([])
   })
 })
 

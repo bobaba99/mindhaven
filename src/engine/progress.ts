@@ -1,4 +1,4 @@
-import { BUILDINGS } from '../data/buildings'
+import { BUILDINGS, TOWNSFOLK } from '../data/buildings'
 
 const STORAGE_KEY = 'mindhaven.progress.v1'
 
@@ -11,14 +11,18 @@ export interface ProgressState {
   visitedBuildings: string[]
   /** Building ids unlocked once their Insight threshold was reached. */
   unlockedBuildings: string[]
+  /** Townsfolk quest ids (= townsperson ids) the player has completed. */
+  completedQuests: string[]
 }
 
 export const INSIGHT_PER_INTRO = 2
 export const INSIGHT_PER_LECTURE = 3
+export const INSIGHT_PER_QUEST = 5
 
 // Valid id sets, so corrupt or tampered storage can't inject unknown ids.
 const VALID_BUILDING_IDS = new Set(BUILDINGS.map((b) => b.id))
 const VALID_LECTURE_IDS = new Set(BUILDINGS.flatMap((b) => b.lectures.map((l) => l.id)))
+const VALID_QUEST_IDS = new Set(TOWNSFOLK.map((t) => t.id))
 
 /** Keep only the string members of `value` that pass `valid`, de-duplicated. */
 function sanitizeIds(value: unknown, valid: ReadonlySet<string>): string[] {
@@ -45,6 +49,7 @@ export function defaultProgress(): ProgressState {
     completedLectures: [],
     visitedBuildings: [],
     unlockedBuildings: free,
+    completedQuests: [],
   }
 }
 
@@ -67,6 +72,8 @@ export function loadProgress(): ProgressState {
           ...sanitizeIds(obj.unlockedBuildings, VALID_BUILDING_IDS),
         ]),
       ],
+      // pre-v1.3 saves have no quest field — treat as none completed
+      completedQuests: sanitizeIds(obj.completedQuests, VALID_QUEST_IDS),
     }
   } catch {
     return defaultProgress()
@@ -125,6 +132,18 @@ export function markLectureComplete(
     ...state,
     completedLectures: [...state.completedLectures, lectureId],
     insight: state.insight + INSIGHT_PER_LECTURE,
+  }
+}
+
+export function markQuestComplete(
+  state: ProgressState,
+  questId: string,
+): ProgressState {
+  if (state.completedQuests.includes(questId)) return state
+  return {
+    ...state,
+    completedQuests: [...state.completedQuests, questId],
+    insight: state.insight + INSIGHT_PER_QUEST,
   }
 }
 

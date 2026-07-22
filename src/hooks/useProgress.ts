@@ -4,6 +4,7 @@ import {
   saveProgress,
   markVisited,
   markLectureComplete,
+  markQuestComplete,
   unlockBuilding,
   type ProgressState,
 } from '../engine/progress'
@@ -34,6 +35,9 @@ export function useProgress() {
   const unlock = (buildingId: string) =>
     setProgress((p) => unlockBuilding(p, buildingId))
 
+  const completeQuest = (questId: string) =>
+    setProgress((p) => markQuestComplete(p, questId))
+
   const addInsight = (amount: number) =>
     setProgress((p) => ({ ...p, insight: p.insight + amount }))
 
@@ -43,12 +47,14 @@ export function useProgress() {
       completedLectures: [],
       visitedBuildings: [],
       unlockedBuildings: loadProgress().unlockedBuildings,
+      completedQuests: [],
     })
 
   return {
     progress,
     readIntro,
     completeLecture,
+    completeQuest,
     unlock,
     addInsight,
     reset,
