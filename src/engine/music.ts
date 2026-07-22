@@ -8,7 +8,7 @@
  * modern end warmer and denser. Entering a building plays a short two-bar
  * stinger flavored by that school of thought. Every call is failure-safe.
  */
-import { BUILDINGS } from '../data/buildings'
+import { ALL_BUILDINGS } from '../data/buildings'
 import {
   getAudioContext,
   getVolume,
@@ -166,7 +166,7 @@ function flavorFor(school: string): MotifFlavor {
   return { wave: 'sine', scale: MINOR_PENTA, rootFreq: 220 }
 }
 
-const SCHOOL_BY_ID = new Map(BUILDINGS.map((b) => [b.id, b.school]))
+const SCHOOL_BY_ID = new Map(ALL_BUILDINGS.map((b) => [b.id, b.school]))
 
 /**
  * A building's interior stinger: a deterministic two-bar motif whose timbre

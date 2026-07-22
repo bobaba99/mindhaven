@@ -22,6 +22,9 @@ export type HookKind =
   | 'kahneman-snap' // Kahneman: fast vs slow snap question
   | 'loftus-photo' // Loftus: leading-question photo interview
   | 'asch-stage' // Asch: line judging against a planted crowd
+  | 'ebbinghaus-recall' // Ebbinghaus: nonsense syllables stale on the 1885 curve
+  | 'bartlett-swap' // Bartlett: predict how War of the Ghosts warps
+  | 'sperling-flash' // Sperling: whole vs cued partial report on a flashed grid
   | 'stub' // styled "hook coming soon"
 
 export interface Building {

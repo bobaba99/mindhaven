@@ -1,4 +1,4 @@
-import { BUILDINGS, TOWNSFOLK } from '../data/buildings'
+import { ALL_BUILDINGS, TOWNSFOLK } from '../data/buildings'
 
 const STORAGE_KEY = 'mindhaven.progress.v1'
 
@@ -20,8 +20,10 @@ export const INSIGHT_PER_LECTURE = 3
 export const INSIGHT_PER_QUEST = 5
 
 // Valid id sets, so corrupt or tampered storage can't inject unknown ids.
-const VALID_BUILDING_IDS = new Set(BUILDINGS.map((b) => b.id))
-const VALID_LECTURE_IDS = new Set(BUILDINGS.flatMap((b) => b.lectures.map((l) => l.id)))
+const VALID_BUILDING_IDS = new Set(ALL_BUILDINGS.map((b) => b.id))
+const VALID_LECTURE_IDS = new Set(
+  ALL_BUILDINGS.flatMap((b) => b.lectures.map((l) => l.id)),
+)
 const VALID_QUEST_IDS = new Set(TOWNSFOLK.map((t) => t.id))
 
 /** Keep only the string members of `value` that pass `valid`, de-duplicated. */
@@ -43,7 +45,7 @@ function sanitizeInsight(value: unknown): number {
 
 export function defaultProgress(): ProgressState {
   // Buildings with unlockCost 0 are open from the start.
-  const free = BUILDINGS.filter((b) => b.unlockCost === 0).map((b) => b.id)
+  const free = ALL_BUILDINGS.filter((b) => b.unlockCost === 0).map((b) => b.id)
   return {
     insight: 0,
     completedLectures: [],
@@ -94,7 +96,7 @@ export function isUnlocked(state: ProgressState, buildingId: string): boolean {
 
 /** Insight needed to unlock a building, or 0 if already unlocked/free. */
 export function unlockCostFor(buildingId: string): number {
-  return BUILDINGS.find((b) => b.id === buildingId)?.unlockCost ?? 0
+  return ALL_BUILDINGS.find((b) => b.id === buildingId)?.unlockCost ?? 0
 }
 
 /**
@@ -162,4 +164,7 @@ export function unlockBuilding(state: ProgressState, buildingId: string): Progre
 }
 
 /** Total lectures available across all buildings (for journal progress). */
-export const TOTAL_LECTURES = BUILDINGS.reduce((n, b) => n + b.lectures.length, 0)
+export const TOTAL_LECTURES = ALL_BUILDINGS.reduce(
+  (n, b) => n + b.lectures.length,
+  0,
+)

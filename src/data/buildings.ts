@@ -554,6 +554,134 @@ export const BUILDINGS: Building[] = [
   },
 ]
 
+/**
+ * Memory Lane (v1.4) — the short street branching north through the gate
+ * between Calkins' and Pavlov's. Three shops for the memory researchers;
+ * orders continue after Main Street's 14.
+ */
+export const LANE_BUILDINGS: Building[] = [
+  {
+    order: 15,
+    id: 'ebbinghaus-bakery',
+    name: "Ebbinghaus's Forgetting-Curve Bakery",
+    figure: 'Hermann Ebbinghaus',
+    dates: '1850–1909',
+    school: 'Memory (experimental)',
+    stardewAnalog: 'Bakery',
+    intro:
+      "Mind the shelves — everything here goes stale on a schedule I measured personally. In 1885 I taught myself two thousand meaningless syllables, timed my own forgetting, and drew the curve you now walk past daily. Learn today's batch; we'll see what the afternoon leaves you.",
+    hookDescription:
+      "Memorize the morning batch of nonsense syllables, watch the stock stale on the real 1885 curve, then taste the 'savings' of relearning.",
+    hookKind: 'ebbinghaus-recall',
+    unlockCost: 90,
+    palette: {
+      wall: '#e2c58f', wallDark: '#c0a46c', roof: '#9c5d2a', roofDark: '#7a4820',
+      door: '#4a3018', accent: '#e8c860',
+    },
+    lectures: [
+      {
+        id: 'ebbinghaus-syllables',
+        title: 'Nonsense Syllables: Measuring Memory From Scratch',
+        blurb:
+          "To study pure memory I needed material with no meaning to help it along — so I invented the nonsense syllable: ZOK, BAF, MIB. I was my own only subject, learning list after list to a strict criterion, metronome ticking. Psychology's first rigorous memory experiments were conducted by one very patient man on himself.",
+      },
+      {
+        id: 'ebbinghaus-curve',
+        title: 'The Forgetting Curve — Steep, Then Stubborn',
+        blurb:
+          "Forgetting is fastest in the first hour: barely twenty minutes after learning I retained just 58 percent, and after a day, about a third. But then the curve flattens — what survives the first day tends to survive the month. Memory does not leak steadily; it pours, then drips.",
+      },
+      {
+        id: 'ebbinghaus-savings',
+        title: 'Savings: What Relearning Reveals',
+        blurb:
+          "Even when I could not recall a single syllable of an old list, relearning it took fewer repetitions than the first time — the difference I called savings. Recall is a poor census of what remains; some trace persists below the surface. And lists studied in spaced sittings kept their savings far better than crammed ones.",
+      },
+    ],
+  },
+  {
+    order: 16,
+    id: 'bartlett-stand',
+    name: "Bartlett's Story-Swap Stand",
+    figure: 'Frederic Bartlett',
+    dates: '1886–1969',
+    school: 'Memory (reconstructive)',
+    stardewAnalog: 'Market stand',
+    intro:
+      "Step up, step up — one story, freely retold! I hand you 'The War of the Ghosts', you hand it to the next visitor, and we watch what memory does to it. Spoiler from 1932: memory is no gramophone. It is a storyteller with opinions.",
+    hookDescription:
+      "Read the original tale, then predict how each detail warps across retellings — toward the familiar, never at random.",
+    hookKind: 'bartlett-swap',
+    unlockCost: 96,
+    palette: {
+      wall: '#a8bfa0', wallDark: '#879e80', roof: '#5a7a8c', roofDark: '#435d6c',
+      door: '#3a3020', accent: '#d8c060',
+    },
+    lectures: [
+      {
+        id: 'bartlett-ghosts',
+        title: "'The War of the Ghosts': Serial Reproduction",
+        blurb:
+          "I gave Cambridge students a Native American tale, deliberately far from their world, and had each retell it to the next. Canoes became boats, seal hunts became fishing trips, and the ghosts — the point of the story! — quietly vanished. Each teller reshaped it toward what already made sense to them.",
+      },
+      {
+        id: 'bartlett-schema',
+        title: 'Schema Theory and the Effort After Meaning',
+        blurb:
+          "We meet every new experience with organized past experience — a schema — and remembering is an 'effort after meaning' built from it. Recall is reconstruction: a plausible redrawing from the schema plus a few salvaged details, delivered with full confidence. The feeling of accuracy is not evidence of it.",
+      },
+      {
+        id: 'bartlett-legacy',
+        title: 'Why Reconstruction Matters: From My Stand to the Courtroom',
+        blurb:
+          "If memory rebuilds rather than replays, then every retelling is an opportunity for revision — which is why your best anecdote keeps improving. Decades later my friend down on the main street, Professor Loftus, showed how a single suggestive question exploits exactly this machinery. Treat every vivid memory as a draft, not a document.",
+      },
+    ],
+  },
+  {
+    order: 17,
+    id: 'sperling-kiosk',
+    name: "Sperling's Flash-Photo Kiosk",
+    figure: 'George Sperling',
+    dates: 'b. 1934',
+    school: 'Cognitive (iconic memory)',
+    stardewAnalog: 'Photo kiosk',
+    intro:
+      "One flash, nine letters, a twentieth of a second — how many did you catch? Four, you'll say. But in 1960 I rang a bell AFTER the picture vanished and proved you briefly held nearly all of them. Your eyes take a photograph; it just develops and evaporates before you can read it aloud.",
+    hookDescription:
+      'A letter grid flashes and is gone — report everything, then let the bell cue a single row and feel the difference.',
+    hookKind: 'sperling-flash',
+    unlockCost: 102,
+    palette: {
+      wall: '#9aa8b8', wallDark: '#7a8794', roof: '#3a4a5e', roofDark: '#2a3646',
+      door: '#26303c', accent: '#d8b84b',
+    },
+    lectures: [
+      {
+        id: 'sperling-partial',
+        title: 'The Partial-Report Trick',
+        blurb:
+          "Asked to report a whole flashed grid, people manage about four letters. So I cued them — high, medium, or low tone — AFTER the display vanished, naming one row to report. They could read off almost any row I picked, which means nearly the whole grid was momentarily in there. The bottleneck is the reporting, not the seeing.",
+      },
+      {
+        id: 'sperling-icon',
+        title: 'Iconic Memory: A Photograph That Will Not Keep',
+        blurb:
+          "The visual system holds a brief, high-capacity snapshot of the scene — later christened iconic memory. Delay my cue by even a second and the advantage collapses to ordinary levels: the icon fades in roughly a quarter to half a second. Enormous capacity, hopeless shelf life.",
+      },
+      {
+        id: 'sperling-registers',
+        title: 'From Sensory Registers to the Memory Store',
+        blurb:
+          "The icon is the front porch of memory: a sensory register where everything lands and almost everything is lost. Whatever you attend to gets passed inside to short-term memory, and rehearsal may carry it further still — the multi-store picture Atkinson and Shiffrin assembled in 1968. Attention, not the eyes, decides what you keep.",
+      },
+    ],
+  },
+]
+
+/** Every building in town: Main Street west→east, then Memory Lane. */
+export const ALL_BUILDINGS: Building[] = [...BUILDINGS, ...LANE_BUILDINGS]
+
 /** The five wandering townsfolk (lighter NPC data). */
 export const TOWNSFOLK: Townsperson[] = [
   {

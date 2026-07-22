@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { BUILDINGS, TOWNSFOLK } from '../data/buildings'
+import { ALL_BUILDINGS, BUILDINGS, TOWNSFOLK } from '../data/buildings'
 import {
   INSIGHT_PER_INTRO,
   INSIGHT_PER_LECTURE,
@@ -137,10 +137,12 @@ describe('unlock gating (threshold, NOT a spend)', () => {
 })
 
 describe('TOTAL_LECTURES', () => {
-  it('counts every lecture across all buildings', () => {
-    const manual = BUILDINGS.reduce((n, b) => n + b.lectures.length, 0)
+  it('counts every lecture across all buildings, Memory Lane included', () => {
+    const manual = ALL_BUILDINGS.reduce((n, b) => n + b.lectures.length, 0)
     expect(TOTAL_LECTURES).toBe(manual)
-    expect(TOTAL_LECTURES).toBeGreaterThan(0)
+    expect(TOTAL_LECTURES).toBeGreaterThan(
+      BUILDINGS.reduce((n, b) => n + b.lectures.length, 0),
+    )
   })
 })
 

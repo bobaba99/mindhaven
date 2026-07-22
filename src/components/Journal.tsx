@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { BUILDINGS, TOWNSFOLK } from '../data/buildings'
-import type { MiniLecture } from '../data/types'
+import { BUILDINGS, LANE_BUILDINGS, TOWNSFOLK } from '../data/buildings'
+import type { Building, MiniLecture } from '../data/types'
 import { questFor } from '../engine/quests/quests'
 
 interface JournalProps {
@@ -20,6 +20,42 @@ export function Journal({
   onClose,
 }: JournalProps) {
   const [view, setView] = useState<'lectures' | 'folk'>('lectures')
+
+  const renderShops = (shops: Building[]) =>
+    shops.map((b) => {
+      const unlocked = unlockedBuildings.includes(b.id)
+      return (
+        <section key={b.id} className="journal__shop">
+          <h3 className={unlocked ? '' : 'is-locked'}>
+            {unlocked ? '' : '🔒 '}
+            {b.order}. {b.name}
+            <small> — {b.figure}</small>
+          </h3>
+          {unlocked ? (
+            <ul>
+              {b.lectures.map((l) => {
+                const done = completedLectures.includes(l.id)
+                return (
+                  <li key={l.id}>
+                    <button
+                      className="journal__lecture"
+                      onClick={() => onRevisit(l)}
+                    >
+                      <span>{done ? '✓' : '◆'}</span>
+                      {l.title}
+                    </button>
+                  </li>
+                )
+              })}
+            </ul>
+          ) : (
+            <p className="journal__locked-note">
+              Bank {b.unlockCost} ◆ Insight to unlock these lectures.
+            </p>
+          )}
+        </section>
+      )
+    })
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -58,41 +94,13 @@ export function Journal({
 
         <div className="journal__body">
           <div className="tab-fade" key={view}>
-          {view === 'lectures' &&
-            BUILDINGS.map((b) => {
-              const unlocked = unlockedBuildings.includes(b.id)
-              return (
-                <section key={b.id} className="journal__shop">
-                  <h3 className={unlocked ? '' : 'is-locked'}>
-                    {unlocked ? '' : '🔒 '}
-                    {b.order}. {b.name}
-                    <small> — {b.figure}</small>
-                  </h3>
-                  {unlocked ? (
-                    <ul>
-                      {b.lectures.map((l) => {
-                        const done = completedLectures.includes(l.id)
-                        return (
-                          <li key={l.id}>
-                            <button
-                              className="journal__lecture"
-                              onClick={() => onRevisit(l)}
-                            >
-                              <span>{done ? '✓' : '◆'}</span>
-                              {l.title}
-                            </button>
-                          </li>
-                        )
-                      })}
-                    </ul>
-                  ) : (
-                    <p className="journal__locked-note">
-                      Bank {b.unlockCost} ◆ Insight to unlock these lectures.
-                    </p>
-                  )}
-                </section>
-              )
-            })}
+          {view === 'lectures' && (
+            <>
+              {renderShops(BUILDINGS)}
+              <h3 className="journal__street-head">🌿 Memory Lane</h3>
+              {renderShops(LANE_BUILDINGS)}
+            </>
+          )}
 
           {view === 'folk' && (
             <ul className="journal__folk">
