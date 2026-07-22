@@ -1,11 +1,15 @@
-import { BUILDINGS } from '../data/buildings'
+import { BUILDINGS, LANE_BUILDINGS } from '../data/buildings'
+import type { Building } from '../data/types'
 
 /**
- * World layout for Wundt Way. The town is a horizontal Main Street: a wide
- * grid where 14 building facades sit in a row along the north side, a walkable
- * path runs along the south, and grass frames it. All units are TILES; the
- * renderer multiplies by TILE * SCALE for pixels.
+ * World layout. The town has two districts, each a horizontal street: Main
+ * Street (Wundt Way, 14 facades) and Memory Lane (3 facades, reached through
+ * a gate that "branches north" between Calkins' and Pavlov's). Both share the
+ * same vertical band structure; only the column count differs. All units are
+ * TILES; the renderer multiplies by TILE * SCALE for pixels.
  */
+
+export type District = 'main' | 'lane'
 
 export const TILE = 16 // internal pixels per tile
 export const SCALE = 3 // integer upscale for crisp pixel art
@@ -48,9 +52,9 @@ export interface BuildingPlacement {
   doorRow: number
 }
 
-/** Compute deterministic left->right placements for every building. */
-export function computePlacements(): BuildingPlacement[] {
-  return BUILDINGS.map((b, i) => {
+/** Compute deterministic left->right placements for a row of buildings. */
+export function computePlacementsFor(buildings: Building[]): BuildingPlacement[] {
+  return buildings.map((b, i) => {
     const col =
       EDGE_MARGIN_TILES + i * (BUILDING_TILES_W + BUILDING_GAP)
     const doorCol = col + Math.floor(BUILDING_TILES_W / 2)
@@ -66,11 +70,79 @@ export function computePlacements(): BuildingPlacement[] {
   })
 }
 
-export const PLACEMENTS = computePlacements()
+/** @deprecated main-street helper kept for existing callers/tests. */
+export function computePlacements(): BuildingPlacement[] {
+  return computePlacementsFor(BUILDINGS)
+}
+
+export const PLACEMENTS = computePlacementsFor(BUILDINGS)
 
 /** Pixel dimensions of the whole world (pre-scale). */
 export const WORLD_W = WORLD_COLS * TILE
 export const WORLD_H = WORLD_ROWS * TILE
+
+// ---------- Memory Lane (v1.4) ----------
+
+export const LANE_WORLD_COLS =
+  EDGE_MARGIN_TILES * 2 +
+  LANE_BUILDINGS.length * BUILDING_TILES_W +
+  (LANE_BUILDINGS.length - 1) * BUILDING_GAP
+
+export const LANE_PLACEMENTS = computePlacementsFor(LANE_BUILDINGS)
+export const LANE_WORLD_W = LANE_WORLD_COLS * TILE
+
+/** Everything a renderer/simulation needs to know about one district. */
+export interface DistrictLayout {
+  district: District
+  buildings: Building[]
+  cols: number
+  worldW: number
+  placements: BuildingPlacement[]
+}
+
+const MAIN_LAYOUT: DistrictLayout = {
+  district: 'main',
+  buildings: BUILDINGS,
+  cols: WORLD_COLS,
+  worldW: WORLD_W,
+  placements: PLACEMENTS,
+}
+
+const LANE_LAYOUT: DistrictLayout = {
+  district: 'lane',
+  buildings: LANE_BUILDINGS,
+  cols: LANE_WORLD_COLS,
+  worldW: LANE_WORLD_W,
+  placements: LANE_PLACEMENTS,
+}
+
+export function layoutFor(district: District): DistrictLayout {
+  return district === 'main' ? MAIN_LAYOUT : LANE_LAYOUT
+}
+
+/**
+ * The Memory Lane gate: an archway in the gap between the 2nd and 3rd main
+ * street facades (Calkins' and Pavlov's — Ebbinghaus's 1885 slots right into
+ * that stretch of the timeline). Walking through requires banking 90 ◆; like
+ * every gate in town it is a threshold, not a spend.
+ */
+export const LANE_UNLOCK_COST = 90
+export const GATE_COL = PLACEMENTS[1].col + BUILDING_TILES_W
+export const GATE_W_TILES = BUILDING_GAP
+/** World-space x of the gate's interaction point (center of the gap). */
+export const GATE_DOOR_X = (GATE_COL + GATE_W_TILES / 2) * TILE
+export const GATE_DOOR_ROW = STREET_ROW
+
+/** Where the lane's exit (back to Main Street) sits: the west margin. */
+export const LANE_EXIT_DOOR_X = TILE * 1.5
+export const LANE_EXIT_DOOR_ROW = STREET_ROW
+
+/** Spawn points for district transitions. */
+export function spawnXFor(district: District, cameFrom: District | null): number {
+  if (district === 'lane') return TILE * 3 // just inside the lane's entrance
+  if (cameFrom === 'lane') return GATE_DOOR_X - TILE / 2 // back at the gate
+  return TILE * 1.5 // fresh game: west end of Main Street
+}
 
 /**
  * Walkable region in tile coordinates: the player may roam the street band and

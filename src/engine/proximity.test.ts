@@ -1,6 +1,23 @@
 import { describe, expect, it } from 'vitest'
-import { TILE, INTERACT_RADIUS, PLACEMENTS, PLAYER_W, PLAYER_H } from './world'
-import { nearestBuildingId, nearestInteractable, TALK_RADIUS } from './proximity'
+import {
+  TILE,
+  INTERACT_RADIUS,
+  PLACEMENTS,
+  LANE_PLACEMENTS,
+  GATE_DOOR_X,
+  GATE_DOOR_ROW,
+  LANE_EXIT_DOOR_X,
+  LANE_EXIT_DOOR_ROW,
+  PLAYER_W,
+  PLAYER_H,
+} from './world'
+import {
+  GATE_TO_LANE,
+  GATE_TO_MAIN,
+  nearestBuildingId,
+  nearestInteractable,
+  TALK_RADIUS,
+} from './proximity'
 import { spawnPlayer, type PlayerState } from './player'
 import type { WandererState } from './townsfolk'
 
@@ -64,6 +81,33 @@ describe('nearestInteractable', () => {
     const py = firstDoor.y + TILE * 4
     const folk = [wandererAt('anna-freud', px + TALK_RADIUS + 20, py)]
     expect(nearestInteractable(playerAt(px, py), folk)).toBeNull()
+  })
+
+  it('finds the Memory Lane gate between Calkins and Pavlov', () => {
+    const near = nearestInteractable(
+      playerAt(GATE_DOOR_X, GATE_DOOR_ROW * TILE),
+      [],
+      'main',
+    )
+    expect(near).toEqual({ kind: 'gate', id: GATE_TO_LANE })
+  })
+
+  it('finds lane buildings and the exit gate when in the lane district', () => {
+    const laneDoor = {
+      x: LANE_PLACEMENTS[0].doorCol * TILE + TILE / 2,
+      y: LANE_PLACEMENTS[0].doorRow * TILE,
+    }
+    expect(nearestInteractable(playerAt(laneDoor.x, laneDoor.y), [], 'lane')).toEqual({
+      kind: 'building',
+      id: LANE_PLACEMENTS[0].id,
+    })
+    expect(
+      nearestInteractable(
+        playerAt(LANE_EXIT_DOOR_X, LANE_EXIT_DOOR_ROW * TILE),
+        [],
+        'lane',
+      ),
+    ).toEqual({ kind: 'gate', id: GATE_TO_MAIN })
   })
 
   it('keeps nearestBuildingId behavior intact (regression)', () => {

@@ -20,7 +20,6 @@ export interface PlayerState {
 }
 
 const WALK_MIN_X = TILE * 0.5
-const WALK_MAX_X = WORLD_W - PLAYER_W - TILE * 0.5
 const WALK_MIN_Y = WALK_TOP_ROW * TILE
 const WALK_MAX_Y = (WALK_BOTTOM_ROW + 1) * TILE - PLAYER_H
 
@@ -28,11 +27,12 @@ const WALK_MAX_Y = (WALK_BOTTOM_ROW + 1) * TILE - PLAYER_H
  * Where the player first spawns: on the western edge of town, a short stroll
  * WEST of the Leipzig Lab's door radius — so the first thing a new player does
  * is walk (which is exactly what the first-run tour teaches), and the whole
- * west→east timeline lies ahead of them.
+ * west→east timeline lies ahead of them. District transitions pass their own
+ * spawn x (see spawnXFor in world.ts).
  */
-export function spawnPlayer(): PlayerState {
+export function spawnPlayer(x: number = TILE * 1.5): PlayerState {
   return {
-    x: TILE * 1.5,
+    x,
     y: WALK_MIN_Y + TILE * 1.5,
     facing: 'right',
     animTime: 0,
@@ -46,12 +46,14 @@ function clamp(v: number, lo: number, hi: number): number {
 
 /**
  * Advance the player by one tick. Pure-ish: returns a new state object
- * (immutable update) rather than mutating the input.
+ * (immutable update) rather than mutating the input. `worldW` bounds the
+ * eastward walk — Main Street and Memory Lane differ only in width.
  */
 export function stepPlayer(
   prev: PlayerState,
   input: InputState,
   dt: number,
+  worldW: number = WORLD_W,
 ): PlayerState {
   let dx = 0
   let dy = 0
@@ -76,7 +78,8 @@ export function stepPlayer(
   }
 
   const dist = PLAYER_SPEED * dt
-  const nx = clamp(prev.x + dx * dist, WALK_MIN_X, WALK_MAX_X)
+  const maxX = worldW - PLAYER_W - TILE * 0.5
+  const nx = clamp(prev.x + dx * dist, WALK_MIN_X, maxX)
   const ny = clamp(prev.y + dy * dist, WALK_MIN_Y, WALK_MAX_Y)
 
   return {
