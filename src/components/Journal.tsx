@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
 import { BUILDINGS, TOWNSFOLK } from '../data/buildings'
 import type { MiniLecture } from '../data/types'
+import { questFor } from '../engine/quests/quests'
 
 interface JournalProps {
   completedLectures: string[]
   unlockedBuildings: string[]
+  completedQuests: string[]
   onRevisit: (lecture: MiniLecture) => void
   onClose: () => void
 }
@@ -13,6 +15,7 @@ interface JournalProps {
 export function Journal({
   completedLectures,
   unlockedBuildings,
+  completedQuests,
   onRevisit,
   onClose,
 }: JournalProps) {
@@ -93,18 +96,28 @@ export function Journal({
 
           {view === 'folk' && (
             <ul className="journal__folk">
-              {TOWNSFOLK.map((t) => (
-                <li key={t.id}>
-                  <div className="journal__folk-dot" style={{ background: t.color }} />
-                  <div>
-                    <strong>
-                      {t.name} <small>{t.dates}</small>
-                    </strong>
-                    <p className="journal__folk-line">“{t.blurb}”</p>
-                    <p className="journal__folk-contrib">{t.contribution}</p>
-                  </div>
-                </li>
-              ))}
+              {TOWNSFOLK.map((t) => {
+                const quest = questFor(t.id)
+                const done = completedQuests.includes(t.id)
+                return (
+                  <li key={t.id}>
+                    <div className="journal__folk-dot" style={{ background: t.color }} />
+                    <div>
+                      <strong>
+                        {t.name} <small>{t.dates}</small>
+                      </strong>
+                      <p className="journal__folk-line">“{t.blurb}”</p>
+                      <p className="journal__folk-contrib">{t.contribution}</p>
+                      {quest && (
+                        <p className="journal__folk-quest">
+                          {done ? '✓' : '◆'} {quest.title}
+                          {done ? ' — errand complete' : ' — find them on the street'}
+                        </p>
+                      )}
+                    </div>
+                  </li>
+                )
+              })}
             </ul>
           )}
           </div>
