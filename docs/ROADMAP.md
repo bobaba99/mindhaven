@@ -11,8 +11,8 @@ delay with appropriate small-town drama.
 | v1.0 | 2026-06-11 | Launch | ✅ shipped + [thread posted](https://x.com/gnegavin/status/2065059326193025330) |
 | v1.1 | 2026-06-11 | The Premium Pass | ✅ shipped same day (tour, typography, 3D cards, Gazette) |
 | v1.2 | 2026-07-02 | Music of the Spheres | ✅ shipped (slipped from 06-24; the Gazette has apologized on the metronome's behalf) |
-| v1.3 | 2026-07-08 | Townsfolk Tales | 🔨 planned |
-| v1.4 | 2026-07-22 | Memory Lane | 🔨 planned |
+| v1.3 | 2026-07-22 | Townsfolk Tales | ✅ shipped (slipped from 07-08; the Gazette has diffused responsibility across the situation) |
+| v1.4 | 2026-07-22 | Memory Lane | 🔨 in progress |
 | v1.5 | 2026-08-05 | Night Shift | 🔨 planned |
 
 ## v1.2 — Music of the Spheres (2026-06-24)

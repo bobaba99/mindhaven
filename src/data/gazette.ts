@@ -106,6 +106,45 @@ export const ISSUES: GazetteIssue[] = [
       },
     ],
   },
+  {
+    number: 3,
+    version: 'v1.3',
+    date: '2026-07-22',
+    headline: 'WANDERERS FINALLY HAVE SOMEWHERE TO BE',
+    subhead:
+      'Five familiar strollers stop pacing and start teaching; errands pay five Insight apiece, and the Gazette apologizes for arriving a fortnight late',
+    articles: [
+      {
+        title: 'The Five Stop Strolling',
+        body:
+          'Since opening day, five distinguished figures have paced Wundt Way with nowhere in particular to be — nodding politely, teaching nothing. No longer. Walk up to any of them and they will stop, turn to face you, and put you to work: Mary Ainsworth has three street reunions for you to read, Leon Festinger wants his plum purchase audited for sour grapes, William James has misplaced three thoughts over the cobbles, Alfred Adler has noticed two neighbors eating lunch alone, and Anna Freud has sketched the fountain crowd onto cards. Each errand banks five Insight, once, forever.',
+      },
+      {
+        title: 'Teaching by Errand, Not by Lectern',
+        kicker: 'SCHOOLS DESK',
+        body:
+          'The shopkeepers lecture; the wanderers make you do the work, which everyone in town agrees is the better pedagogy and nobody proposes applying to the shopkeepers. You will classify attachment reunions the way Ainsworth’s Baltimore coders did, flag dissonance repairs mid-sentence, and discover that a caught thought is no longer the thought you were chasing — Mr. James is very pleased about that last one.',
+      },
+      {
+        title: 'Issue Arrives Fourteen Days Late; Everyone Blamed This Time',
+        kicker: 'CORRECTIONS & CLARIFICATIONS',
+        body:
+          'This edition was promised for July the 8th and is appearing on the 22nd. Last issue the metronome took the fall; this time the editorial board conducted a thorough review and concluded that responsibility is best understood as diffused across the situation — a finding Mr. Milgram calls "extremely on brand for this street." The printing schedule remains: whenever it’s ready, ideally Wednesdays.',
+      },
+      {
+        title: 'Toast Ordered to Yield',
+        kicker: 'STRESS-TEST DESK',
+        body:
+          'While teaching the wanderers to talk, the town’s machinery review caught a standing nuisance: the guided tour’s helpful toast could hover in front of an open Journal and quietly eat the clicks meant for its tabs. The toast has been instructed to step aside whenever any panel is open, and it complied without comment. 186 tests now stand guard where 147 stood before.',
+      },
+      {
+        title: 'Public Notices',
+        kicker: 'NOTICES',
+        body:
+          'Wanderers pause politely when you approach — chasing them down the street is no longer required nor encouraged. Errand progress lives in your Journal’s Townsfolk page and, as ever, in your browser and nowhere else. Replaying a finished errand is welcome; the Insight, like the lesson, is only banked once.',
+      },
+    ],
+  },
 ]
 
 export function latestIssue(): GazetteIssue {
