@@ -13,6 +13,9 @@ import { BanduraGame } from './BanduraGame'
 import { KahnemanGame } from './KahnemanGame'
 import { LoftusGame } from './LoftusGame'
 import { AschGame } from './AschGame'
+import { EbbinghausGame } from './EbbinghausGame'
+import { BartlettGame } from './BartlettGame'
+import { SperlingGame } from './SperlingGame'
 import { HookStub } from './HookStub'
 
 interface MinigameHostProps {
@@ -54,6 +57,12 @@ export function MinigameHost({ building, onHookComplete }: MinigameHostProps) {
       return <LoftusGame onSuccess={success} />
     case 'asch-stage':
       return <AschGame onSuccess={success} />
+    case 'ebbinghaus-recall':
+      return <EbbinghausGame onSuccess={success} />
+    case 'bartlett-swap':
+      return <BartlettGame onSuccess={success} />
+    case 'sperling-flash':
+      return <SperlingGame onSuccess={success} />
     case 'stub':
     default:
       return <HookStub hookDescription={building.hookDescription} />
