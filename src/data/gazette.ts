@@ -145,6 +145,45 @@ export const ISSUES: GazetteIssue[] = [
       },
     ],
   },
+  {
+    number: 4,
+    version: 'v1.4',
+    date: '2026-07-22',
+    headline: 'TOWN GROWS A SIDE STREET; NOBODY CAN REMEMBER WHEN',
+    subhead:
+      'Memory Lane opens north of the hedge: a bakery that forgets, a story stand that embellishes, and a photo kiosk faster than your own eyes — second edition in a single day',
+    articles: [
+      {
+        title: 'A Lane Appears Between Calkins’ and Pavlov’s',
+        body:
+          'Residents swear the hedge between the Reading Room and the Provisions was solid last week; the hedge declines to confirm. Behind its new archway runs MEMORY LANE, a short street for the memory researchers — Hermann Ebbinghaus’s Forgetting-Curve Bakery, Bartlett’s Story-Swap Stand, and Sperling’s Flash-Photo Kiosk. Three shops, nine lectures, three activities. The bar across the arch lifts on its own once a traveler has banked 90 ◆ of Insight; as with every gate in town, nothing is spent, only reached.',
+      },
+      {
+        title: 'Bakery Stock Goes Stale on Schedule; Baker Delighted',
+        kicker: 'COMMERCE DESK',
+        body:
+          'The Lane’s bakery stales its goods on the exact curve Herr Ebbinghaus measured on himself in 1885 — 58 percent fresh at twenty minutes, a third by the next morning, and stubbornly unspoiled after that. Ask him why he is pleased about this and he will teach you the real trick: even a forgotten loaf RELEARNS faster than it first baked. He calls the difference savings, and he calls cramming a false economy.',
+      },
+      {
+        title: 'Story Improves With Every Telling; Facts File Complaint',
+        kicker: 'CULTURE DESK',
+        body:
+          'At the Story-Swap Stand, “The War of the Ghosts” is retold all day, and Mr. Bartlett grades not the retellers but the distortions: canoes turning into boats, ghosts quietly shown the door, one black-mouthed detail promoted to vivid centerpiece. Leveling, rationalization, sharpening — memory as reconstruction, exactly as he wrote in 1932. The Gazette, a publication built entirely of retellings, has chosen not to take this personally.',
+      },
+      {
+        title: 'Kiosk Photographs Your Photograph of Its Photograph',
+        kicker: 'TECHNOLOGY DESK',
+        body:
+          'Sperling’s kiosk flashes nine letters and dares you to report them. You will manage about four — unless the bell rings AFTER the flash and names a single row, in which case you will read it off an image your eyes kept without telling you. That quarter-second snapshot — iconic memory, 1960 — holds nearly everything and keeps nearly nothing. The kiosk’s motto: develop quickly.',
+      },
+      {
+        title: 'Public Notices',
+        kicker: 'NOTICES',
+        body:
+          'The town gauge now counts 17 establishments and 51 lectures; the music follows you up the Lane in its warmer registers. Wanderers remain on Main Street — they say the Lane is “a bit young” for them, being barely an afternoon old. 213 tests stand guard where 186 stood this morning. Saves, as always, live in your browser and nowhere else.',
+      },
+    ],
+  },
 ]
 
 export function latestIssue(): GazetteIssue {
