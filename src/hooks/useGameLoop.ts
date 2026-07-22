@@ -3,6 +3,7 @@ import { SCALE, WORLD_W, PLAYER_W } from '../engine/world'
 import { createInput, type InputController, type MoveKey } from '../engine/input'
 import type { TouchControlsHandle } from '../components/TouchControls'
 import {
+  playerCenter,
   spawnPlayer,
   stepPlayer,
   walkStep,
@@ -14,7 +15,7 @@ import {
   wandererStep,
   type WandererState,
 } from '../engine/townsfolk'
-import { nearestBuildingId } from '../engine/proximity'
+import { nearestInteractable, type Interactable } from '../engine/proximity'
 import { setMusicDrift } from '../engine/music'
 import { renderStaticWorld } from '../engine/renderTown'
 import { drawSignOverlay } from '../engine/signOverlay'
@@ -26,10 +27,10 @@ interface UseGameLoopArgs {
   unlockedIds: string[]
   /** True while an overlay is open — freezes movement + the loop's interact. */
   paused: boolean
-  /** Called when the player presses E/Enter near a building door. */
-  onInteract: (buildingId: string) => void
-  /** Reports the building currently in range (for the on-screen prompt). */
-  onNearChange: (buildingId: string | null) => void
+  /** Called when the player presses E/Enter near a door or a townsperson. */
+  onInteract: (target: Interactable) => void
+  /** Reports the interactable currently in range (for the on-screen prompt). */
+  onNearChange: (target: Interactable | null) => void
 }
 
 /**
@@ -47,7 +48,7 @@ export function useGameLoop({
 }: UseGameLoopArgs): TouchControlsHandle {
   const playerRef = useRef<PlayerState>(spawnPlayer())
   const folkRef = useRef<WandererState[]>(spawnTownsfolk())
-  const nearRef = useRef<string | null>(null)
+  const nearRef = useRef<Interactable | null>(null)
   const staticRef = useRef<HTMLCanvasElement | null>(null)
   const pausedRef = useRef(paused)
   const inputRef = useRef<InputController | null>(null)
@@ -108,13 +109,15 @@ export function useGameLoop({
 
       if (!pausedRef.current) {
         playerRef.current = stepPlayer(playerRef.current, input.state, dt)
-        folkRef.current = stepTownsfolk(folkRef.current, dt)
+        const { cx, cy } = playerCenter(playerRef.current)
+        folkRef.current = stepTownsfolk(folkRef.current, dt, { x: cx, y: cy })
 
         // the town theme drifts with the player's place on the century street
         setMusicDrift(playerRef.current.x / (WORLD_W - PLAYER_W))
 
-        const near = nearestBuildingId(playerRef.current)
-        if (near !== nearRef.current) {
+        const near = nearestInteractable(playerRef.current, folkRef.current)
+        const prev = nearRef.current
+        if (near?.id !== prev?.id || near?.kind !== prev?.kind) {
           nearRef.current = near
           onNearChangeRef.current(near)
         }

@@ -1,18 +1,20 @@
 import { useEffect, useRef, useState } from 'react'
 import { SCALE, WORLD_H } from '../engine/world'
 import { useGameLoop } from '../hooks/useGameLoop'
+import type { Interactable } from '../engine/proximity'
 import { InteractPrompt } from './InteractPrompt'
 import { TouchControls } from './TouchControls'
-import { BUILDINGS } from '../data/buildings'
+import { BUILDINGS, TOWNSFOLK } from '../data/buildings'
 
 const BUILDING_NAME = new Map(BUILDINGS.map((b) => [b.id, b.name]))
+const FOLK_NAME = new Map(TOWNSFOLK.map((t) => [t.id, t.name]))
 
 interface TownCanvasProps {
   unlockedIds: string[]
   paused: boolean
-  onInteract: (buildingId: string) => void
-  /** Optional observer for the building currently in interact range. */
-  onNearChange?: (buildingId: string | null) => void
+  onInteract: (target: Interactable) => void
+  /** Optional observer for the interactable currently in range. */
+  onNearChange?: (target: Interactable | null) => void
 }
 
 /**
@@ -27,7 +29,7 @@ export function TownCanvas({
 }: TownCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const wrapRef = useRef<HTMLDivElement>(null)
-  const [near, setNear] = useState<string | null>(null)
+  const [near, setNear] = useState<Interactable | null>(null)
   const onNearChangeRef = useRef(onNearChange)
   onNearChangeRef.current = onNearChange
 
@@ -71,8 +73,13 @@ export function TownCanvas({
       <canvas ref={canvasRef} className="town-canvas" />
       {near && !paused && (
         <InteractPrompt
-          label={BUILDING_NAME.get(near) ?? 'this shop'}
-          locked={!unlockedIds.includes(near)}
+          label={
+            near.kind === 'townsperson'
+              ? FOLK_NAME.get(near.id) ?? 'this wanderer'
+              : BUILDING_NAME.get(near.id) ?? 'this shop'
+          }
+          locked={near.kind === 'building' && !unlockedIds.includes(near.id)}
+          verb={near.kind === 'townsperson' ? 'talk' : 'enter'}
         />
       )}
       {!paused && <TouchControls controls={touch} />}

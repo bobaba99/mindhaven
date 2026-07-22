@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { BUILDINGS } from './data/buildings'
-import type { Building, MiniLecture } from './data/types'
+import { BUILDINGS, TOWNSFOLK } from './data/buildings'
+import type { Building, MiniLecture, Townsperson } from './data/types'
+import type { Interactable } from './engine/proximity'
 import { isUnlocked, canAfford } from './engine/progress'
 import {
   getVolume,
@@ -31,6 +32,7 @@ import {
 } from './engine/tour'
 import { useProgress } from './hooks/useProgress'
 import { TownCanvas } from './components/TownCanvas'
+import { TownsfolkPanel } from './components/TownsfolkPanel'
 import { HUD } from './components/HUD'
 import { DialoguePanel } from './components/DialoguePanel'
 import { LockedModal } from './components/LockedModal'
@@ -43,12 +45,14 @@ import { TourToast } from './components/TourToast'
 import './styles/ui.css'
 
 const BUILDING_BY_ID = new Map(BUILDINGS.map((b) => [b.id, b]))
+const FOLK_BY_ID = new Map(TOWNSFOLK.map((t) => [t.id, t]))
 const INSIGHT_PER_HOOK = 4
 
 type Overlay =
   | { kind: 'none' }
   | { kind: 'dialogue'; building: Building }
   | { kind: 'locked'; building: Building }
+  | { kind: 'townsfolk'; person: Townsperson }
   | { kind: 'journal' }
   | { kind: 'revisit'; lecture: MiniLecture }
   | { kind: 'settings' }
@@ -63,7 +67,8 @@ export function App() {
   const [tour, setTour] = useState<TourState>(() =>
     isTourDone() ? { step: 'done', completed: true } : initialTour(),
   )
-  const { progress, readIntro, completeLecture, unlock, addInsight } = useProgress()
+  const { progress, readIntro, completeLecture, completeQuest, unlock, addInsight } =
+    useProgress()
 
   // Track which buildings have already paid out their one-time hook Insight.
   const hookPaid = useRef<Set<string>>(new Set())
@@ -156,19 +161,27 @@ export function App() {
   }, [progress.completedLectures.length, tour.completed, tourEvent])
 
   const handleNearChange = useCallback(
-    (id: string | null) => {
-      if (id !== null) tourEvent('neared')
+    (target: Interactable | null) => {
+      // the tour's "approach a door" step is about shop doors specifically
+      if (target?.kind === 'building') tourEvent('neared')
     },
     [tourEvent],
   )
 
   const handleInteract = useCallback(
-    (buildingId: string) => {
-      const building = BUILDING_BY_ID.get(buildingId)
-      if (!building) return
-      if (isUnlocked(progress, buildingId)) {
+    (target: Interactable) => {
+      if (target.kind === 'townsperson') {
+        const person = FOLK_BY_ID.get(target.id)
+        if (!person) return
         playSfx('blip')
-        playStinger(buildingId)
+        setOverlay({ kind: 'townsfolk', person })
+        return
+      }
+      const building = BUILDING_BY_ID.get(target.id)
+      if (!building) return
+      if (isUnlocked(progress, target.id)) {
+        playSfx('blip')
+        playStinger(target.id)
         setOverlay({ kind: 'dialogue', building })
         tourEvent('opened')
       } else {
@@ -200,6 +213,18 @@ export function App() {
       completeLecture(lectureId)
     },
     [completeLecture],
+  )
+
+  // Same pattern for townsfolk quests: chime only on first completion —
+  // the reducer itself is idempotent, so replays never double-pay Insight.
+  const questsRef = useRef(progress.completedQuests)
+  questsRef.current = progress.completedQuests
+  const handleQuestComplete = useCallback(
+    (questId: string) => {
+      if (!questsRef.current.includes(questId)) playSfx('chime')
+      completeQuest(questId)
+    },
+    [completeQuest],
   )
 
   // Global J = journal (only when no blocking overlay is mid-flow).
@@ -242,7 +267,9 @@ export function App() {
         />
       </main>
 
-      {started && !tour.completed && tour.step !== 'done' && (
+      {/* The toast yields while any overlay is open — it must never sit on
+          top of a modal and swallow its clicks (found via UI-drive testing). */}
+      {started && !tour.completed && tour.step !== 'done' && overlay.kind === 'none' && (
         <TourToast step={tour.step} onSkip={() => tourEvent('skip')} />
       )}
 
@@ -260,6 +287,15 @@ export function App() {
           onIntroRead={readIntro}
           onLectureComplete={handleLectureComplete}
           onHookComplete={handleHookComplete}
+          onClose={closeOverlay}
+        />
+      )}
+
+      {overlay.kind === 'townsfolk' && (
+        <TownsfolkPanel
+          person={overlay.person}
+          completedQuests={progress.completedQuests}
+          onQuestComplete={handleQuestComplete}
           onClose={closeOverlay}
         />
       )}
@@ -282,6 +318,7 @@ export function App() {
         <Journal
           completedLectures={progress.completedLectures}
           unlockedBuildings={unlockedIds}
+          completedQuests={progress.completedQuests}
           onRevisit={(lecture) => setOverlay({ kind: 'revisit', lecture })}
           onClose={closeOverlay}
         />

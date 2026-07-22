@@ -19,6 +19,9 @@ const MIN_Y = (WALK_TOP_ROW + 1) * TILE
 const MAX_Y = (WALK_BOTTOM_ROW - 1) * TILE
 const SPEED = 22
 
+/** Within this range a wanderer stops strolling and turns to face the player. */
+export const LINGER_RADIUS = TILE * 2.5
+
 /** Spread the five townsfolk along the street at start. */
 export function spawnTownsfolk(): WandererState[] {
   return TOWNSFOLK.map((t, i) => ({
@@ -34,9 +37,24 @@ export function spawnTownsfolk(): WandererState[] {
   }))
 }
 
-/** Simple bouncing wander; returns new array (immutable update). */
-export function stepTownsfolk(prev: WandererState[], dt: number): WandererState[] {
+/**
+ * Simple bouncing wander; returns new array (immutable update). When the
+ * player is close, a wanderer politely stops and faces them — you can't teach
+ * attachment theory to someone chasing you down the street.
+ */
+export function stepTownsfolk(
+  prev: WandererState[],
+  dt: number,
+  player?: { x: number; y: number },
+): WandererState[] {
   return prev.map((w) => {
+    if (player && Math.hypot(player.x - w.x, player.y - w.y) < LINGER_RADIUS) {
+      return {
+        ...w,
+        facing: player.x >= w.x ? 'right' : 'left',
+        animTime: w.animTime, // idle: hold the walk cycle still
+      }
+    }
     let { x, vx, turnIn } = w
     turnIn -= dt
     if (turnIn <= 0) {
